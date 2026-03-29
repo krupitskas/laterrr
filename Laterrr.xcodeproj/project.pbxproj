@@ -1,0 +1,547 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */; };
+		143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044AF9D78396F07C8781FB00 /* PlaceSuggestion.swift */; };
+		236DC46B9B0B0F9AD17D51D5 /* CaptureViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E57A4359E8BA728E6CA2E494 /* CaptureViewModel.swift */; };
+		31722A50A57393AD4626E2B0 /* CameraSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */; };
+		439729F78867E8C033BFD058 /* SavedPlaceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */; };
+		601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492E22026316A922FDE69278 /* LaterrrVisuals.swift */; };
+		74E74CC34199D25E59BFD4B8 /* MapsExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3126750A6288313C256DBDB5 /* MapsExporter.swift */; };
+		7C97B6E94669E22C4D9CBD46 /* VenueTextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */; };
+		839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E64CD3654264C9E1323B351 /* SavedPlace.swift */; };
+		86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */; };
+		93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745887AE56C482E44422E82E /* CaptureView.swift */; };
+		9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251D4DCD245919DF391337EC /* LaterrrApp.swift */; };
+		9ED48515FCA571A2FDECD6AF /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6CF5903E018CB0E839C583 /* SettingsStore.swift */; };
+		BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E54173E655D3C7D69B2BDC67 /* RootView.swift */; };
+		D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */; };
+		D739E2145AEFFAFFF6B0A404 /* MapProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180D3D023BC218AEC4C4E4C2 /* MapProvider.swift */; };
+		F412F74415BD09FAFFF30ECC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3B8AA1B47A9B4A175E3F3 /* SettingsView.swift */; };
+		F9C90089F45850A8F1D67D5E /* VenueMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3425E4962518D33AA4A33FBA /* VenueMatcher.swift */; };
+		FB04DF3047B4542B3600B0F6 /* LocationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */; };
+		FD836E196152CA6F5E3E8A01 /* VenueMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506741CBC543A514909A74BA /* VenueMatcherTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		17165AB9FE937B9D234417D5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 105F6FEF4BC3339D0CABE0B0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2CFED81CA49C8E72BB9BDBD;
+			remoteInfo = Laterrr;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		044AF9D78396F07C8781FB00 /* PlaceSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSuggestion.swift; sourceTree = "<group>"; };
+		0E64CD3654264C9E1323B351 /* SavedPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlace.swift; sourceTree = "<group>"; };
+		180D3D023BC218AEC4C4E4C2 /* MapProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapProvider.swift; sourceTree = "<group>"; };
+		21126B979BC6B0FA26C6FFBE /* Laterrr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Laterrr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		251D4DCD245919DF391337EC /* LaterrrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaterrrApp.swift; sourceTree = "<group>"; };
+		29A83D02E67CDE16DD9FDF5E /* Laterrr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Laterrr.entitlements; sourceTree = "<group>"; };
+		3126750A6288313C256DBDB5 /* MapsExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsExporter.swift; sourceTree = "<group>"; };
+		3425E4962518D33AA4A33FBA /* VenueMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueMatcher.swift; sourceTree = "<group>"; };
+		492E22026316A922FDE69278 /* LaterrrVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaterrrVisuals.swift; sourceTree = "<group>"; };
+		506741CBC543A514909A74BA /* VenueMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueMatcherTests.swift; sourceTree = "<group>"; };
+		5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyVenueSearcher.swift; sourceTree = "<group>"; };
+		6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlaceDetailView.swift; sourceTree = "<group>"; };
+		745887AE56C482E44422E82E /* CaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureView.swift; sourceTree = "<group>"; };
+		86D3B8AA1B47A9B4A175E3F3 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueTextRecognizer.swift; sourceTree = "<group>"; };
+		8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesListView.swift; sourceTree = "<group>"; };
+		9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionModel.swift; sourceTree = "<group>"; };
+		A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceCapturePipeline.swift; sourceTree = "<group>"; };
+		DE6CF5903E018CB0E839C583 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		E3BF0955D8FA4D706137B112 /* LaterrrTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LaterrrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E54173E655D3C7D69B2BDC67 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		E57A4359E8BA728E6CA2E494 /* CaptureViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureViewModel.swift; sourceTree = "<group>"; };
+		FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		270AA5054290C9CC3A08A0AE /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				DDA626A6EF7AF43C5B81B8AE /* Capture */,
+				69F7E87138DCEB2378B476D8 /* Places */,
+				4A06273162BB6CB4E8853016 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		3FB7069F39AB585488E2CFEE = {
+			isa = PBXGroup;
+			children = (
+				F4CC31B0BCCF35381B0BAE70 /* Laterrr */,
+				B3825EE0271C3F42D32AEA3C /* LaterrrTests */,
+				C2D066893D14EE36EC24CE87 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4A06273162BB6CB4E8853016 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				86D3B8AA1B47A9B4A175E3F3 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		55950886F6D9CCFD33F8D6DD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				180D3D023BC218AEC4C4E4C2 /* MapProvider.swift */,
+				044AF9D78396F07C8781FB00 /* PlaceSuggestion.swift */,
+				0E64CD3654264C9E1323B351 /* SavedPlace.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		622D23F8A1AEA8C5E6D8358C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				251D4DCD245919DF391337EC /* LaterrrApp.swift */,
+				E54173E655D3C7D69B2BDC67 /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		69F7E87138DCEB2378B476D8 /* Places */ = {
+			isa = PBXGroup;
+			children = (
+				8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */,
+				6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */,
+			);
+			path = Places;
+			sourceTree = "<group>";
+		};
+		B3825EE0271C3F42D32AEA3C /* LaterrrTests */ = {
+			isa = PBXGroup;
+			children = (
+				506741CBC543A514909A74BA /* VenueMatcherTests.swift */,
+			);
+			path = LaterrrTests;
+			sourceTree = "<group>";
+		};
+		C2D066893D14EE36EC24CE87 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				21126B979BC6B0FA26C6FFBE /* Laterrr.app */,
+				E3BF0955D8FA4D706137B112 /* LaterrrTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE99F087C9E7A7766EE9DCAD /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				492E22026316A922FDE69278 /* LaterrrVisuals.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		DDA626A6EF7AF43C5B81B8AE /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				745887AE56C482E44422E82E /* CaptureView.swift */,
+				E57A4359E8BA728E6CA2E494 /* CaptureViewModel.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		EF53190DF8649A12BD309C02 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */,
+				FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */,
+				3126750A6288313C256DBDB5 /* MapsExporter.swift */,
+				5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */,
+				A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */,
+				DE6CF5903E018CB0E839C583 /* SettingsStore.swift */,
+				3425E4962518D33AA4A33FBA /* VenueMatcher.swift */,
+				87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F4CC31B0BCCF35381B0BAE70 /* Laterrr */ = {
+			isa = PBXGroup;
+			children = (
+				29A83D02E67CDE16DD9FDF5E /* Laterrr.entitlements */,
+				622D23F8A1AEA8C5E6D8358C /* App */,
+				270AA5054290C9CC3A08A0AE /* Features */,
+				55950886F6D9CCFD33F8D6DD /* Models */,
+				EF53190DF8649A12BD309C02 /* Services */,
+				CE99F087C9E7A7766EE9DCAD /* Shared */,
+			);
+			path = Laterrr;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2C9374DC73B999913910924C /* LaterrrTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5DD737613E96CD29D76C6F87 /* Build configuration list for PBXNativeTarget "LaterrrTests" */;
+			buildPhases = (
+				C356B39789F127FF7E5371DC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8EEC352CCA8F5D0EF68D9B11 /* PBXTargetDependency */,
+			);
+			name = LaterrrTests;
+			packageProductDependencies = (
+			);
+			productName = LaterrrTests;
+			productReference = E3BF0955D8FA4D706137B112 /* LaterrrTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A2CFED81CA49C8E72BB9BDBD /* Laterrr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83F58245680507D15FDEC0C1 /* Build configuration list for PBXNativeTarget "Laterrr" */;
+			buildPhases = (
+				8597D24451D2EFCFFA4CD568 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Laterrr;
+			packageProductDependencies = (
+			);
+			productName = Laterrr;
+			productReference = 21126B979BC6B0FA26C6FFBE /* Laterrr.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		105F6FEF4BC3339D0CABE0B0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+			};
+			buildConfigurationList = 277E7E09785A44AD11185EEC /* Build configuration list for PBXProject "Laterrr" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3FB7069F39AB585488E2CFEE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C2D066893D14EE36EC24CE87 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A2CFED81CA49C8E72BB9BDBD /* Laterrr */,
+				2C9374DC73B999913910924C /* LaterrrTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8597D24451D2EFCFFA4CD568 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31722A50A57393AD4626E2B0 /* CameraSessionModel.swift in Sources */,
+				93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */,
+				236DC46B9B0B0F9AD17D51D5 /* CaptureViewModel.swift in Sources */,
+				9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */,
+				601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */,
+				FB04DF3047B4542B3600B0F6 /* LocationStore.swift in Sources */,
+				D739E2145AEFFAFFF6B0A404 /* MapProvider.swift in Sources */,
+				74E74CC34199D25E59BFD4B8 /* MapsExporter.swift in Sources */,
+				D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */,
+				0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */,
+				143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */,
+				86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */,
+				BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */,
+				839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */,
+				439729F78867E8C033BFD058 /* SavedPlaceDetailView.swift in Sources */,
+				9ED48515FCA571A2FDECD6AF /* SettingsStore.swift in Sources */,
+				F412F74415BD09FAFFF30ECC /* SettingsView.swift in Sources */,
+				F9C90089F45850A8F1D67D5E /* VenueMatcher.swift in Sources */,
+				7C97B6E94669E22C4D9CBD46 /* VenueTextRecognizer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C356B39789F127FF7E5371DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD836E196152CA6F5E3E8A01 /* VenueMatcherTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8EEC352CCA8F5D0EF68D9B11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2CFED81CA49C8E72BB9BDBD /* Laterrr */;
+			targetProxy = 17165AB9FE937B9D234417D5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1B74064EDC60DE1F45D1C8C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Laterrr/Laterrr.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 7G73AVR3D5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Laterrr;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Laterrr opens straight into camera mode so you can identify nearby cafes and restaurants from a photo.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Laterrr uses your location to compare the photo against nearby venues in Apple Maps.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Laterrr can keep a photo snapshot with each saved place when you want visual memory.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Laterrr can import a venue photo from your library when you do not want to shoot live.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.krupitskas.laterrr;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		34BC59141D449B82E977FAE0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Laterrr.app/Laterrr";
+			};
+			name = Debug;
+		};
+		519F9ACC630B074CC1FB4D6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		67A5CA100764E3687A0D1749 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Laterrr.app/Laterrr";
+			};
+			name = Release;
+		};
+		74BF105B5520A2265E38D676 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		7F16262FEBA39ECB6C710A1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Laterrr/Laterrr.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 7G73AVR3D5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Laterrr;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Laterrr opens straight into camera mode so you can identify nearby cafes and restaurants from a photo.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Laterrr uses your location to compare the photo against nearby venues in Apple Maps.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Laterrr can keep a photo snapshot with each saved place when you want visual memory.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Laterrr can import a venue photo from your library when you do not want to shoot live.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.krupitskas.laterrr;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		277E7E09785A44AD11185EEC /* Build configuration list for PBXProject "Laterrr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				519F9ACC630B074CC1FB4D6F /* Debug */,
+				74BF105B5520A2265E38D676 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5DD737613E96CD29D76C6F87 /* Build configuration list for PBXNativeTarget "LaterrrTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34BC59141D449B82E977FAE0 /* Debug */,
+				67A5CA100764E3687A0D1749 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		83F58245680507D15FDEC0C1 /* Build configuration list for PBXNativeTarget "Laterrr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F16262FEBA39ECB6C710A1F /* Debug */,
+				1B74064EDC60DE1F45D1C8C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 105F6FEF4BC3339D0CABE0B0 /* Project object */;
+}

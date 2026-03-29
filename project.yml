@@ -1,0 +1,59 @@
+name: Laterrr
+
+options:
+  minimumXcodeGenVersion: 2.39.0
+  xcodeVersion: "26.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: 1
+    ENABLE_PREVIEWS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+
+targets:
+  Laterrr:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Laterrr
+        excludes:
+          - Resources/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.Laterrr
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Laterrr
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: Laterrr opens straight into camera mode so you can identify nearby cafes and restaurants from a photo.
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: Laterrr uses your location to compare the photo against nearby venues in Apple Maps.
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Laterrr can import a venue photo from your library when you do not want to shoot live.
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: Laterrr can keep a photo snapshot with each saved place when you want visual memory.
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        CODE_SIGN_ENTITLEMENTS: Laterrr/Laterrr.entitlements
+        SUPPORTS_MACCATALYST: NO
+
+  LaterrrTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: LaterrrTests
+    dependencies:
+      - target: Laterrr
