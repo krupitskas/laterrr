@@ -30,13 +30,23 @@ enum CameraCaptureError: LocalizedError {
 final class CameraSessionModel: NSObject, ObservableObject {
     @Published private(set) var authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @Published private(set) var isConfigured = false
+    @Published private(set) var displayZoomFactor: CGFloat = 1
+    @Published private(set) var minDisplayZoomFactor: CGFloat = 1
+    @Published private(set) var maxDisplayZoomFactor: CGFloat = 1
+    @Published private(set) var supportsQuietCapture = false
     @Published var lastError: String?
 
-    let session = AVCaptureSession()
+    nonisolated(unsafe) let session = AVCaptureSession()
 
-    private let photoOutput = AVCapturePhotoOutput()
+    nonisolated(unsafe) private let photoOutput = AVCapturePhotoOutput()
     private let sessionQueue = DispatchQueue(label: "Laterrr.camera.session", qos: .userInitiated)
     private var pendingPhotoContinuation: CheckedContinuation<CapturedPhoto, Error>?
+    nonisolated(unsafe) private var cameraDevice: AVCaptureDevice?
+    nonisolated(unsafe) private var displayZoomMultiplier: CGFloat = 1
+
+    var canZoom: Bool {
+        maxDisplayZoomFactor > minDisplayZoomFactor + 0.05
+    }
 
     func prepare() {
         authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
@@ -92,14 +102,48 @@ final class CameraSessionModel: NSObject, ObservableObject {
             sessionQueue.async { [photoOutput] in
                 let settings = AVCapturePhotoSettings()
                 settings.photoQualityPrioritization = .balanced
+                if #available(iOS 18.0, *), photoOutput.isShutterSoundSuppressionSupported {
+                    settings.isShutterSoundSuppressionEnabled = true
+                }
                 photoOutput.capturePhoto(with: settings, delegate: self)
+            }
+        }
+    }
+
+    func setDisplayZoomFactor(_ requestedDisplayZoomFactor: CGFloat) {
+        sessionQueue.async {
+            guard let cameraDevice = self.cameraDevice else { return }
+
+            let multiplier = max(self.displayZoomMultiplier, 0.01)
+            let displayRange = self.allowedDisplayZoomRange(for: cameraDevice, multiplier: multiplier)
+            let clampedDisplayZoomFactor = min(
+                max(requestedDisplayZoomFactor, displayRange.lowerBound),
+                displayRange.upperBound
+            )
+            let actualZoomFactor = min(
+                max(clampedDisplayZoomFactor / multiplier, cameraDevice.minAvailableVideoZoomFactor),
+                cameraDevice.maxAvailableVideoZoomFactor
+            )
+
+            do {
+                try cameraDevice.lockForConfiguration()
+                cameraDevice.videoZoomFactor = actualZoomFactor
+                cameraDevice.unlockForConfiguration()
+
+                Task { @MainActor in
+                    self.displayZoomFactor = actualZoomFactor * multiplier
+                }
+            } catch {
+                Task { @MainActor in
+                    self.lastError = "Laterrr could not change the camera zoom right now."
+                }
             }
         }
     }
 
     private func configureIfNeeded() {
         sessionQueue.async {
-            guard !self.isConfigured else { return }
+            guard self.cameraDevice == nil else { return }
 
             self.session.beginConfiguration()
             self.session.sessionPreset = .photo
@@ -109,7 +153,7 @@ final class CameraSessionModel: NSObject, ObservableObject {
             }
 
             guard
-                let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+                let camera = self.preferredBackCamera(),
                 let input = try? AVCaptureDeviceInput(device: camera),
                 self.session.canAddInput(input),
                 self.session.canAddOutput(self.photoOutput)
@@ -120,13 +164,58 @@ final class CameraSessionModel: NSObject, ObservableObject {
                 return
             }
 
+            self.cameraDevice = camera
             self.session.addInput(input)
             self.session.addOutput(self.photoOutput)
 
+            let multiplier: CGFloat
+            if #available(iOS 18.0, *) {
+                multiplier = max(camera.displayVideoZoomFactorMultiplier, 0.01)
+            } else {
+                multiplier = 1
+            }
+            self.displayZoomMultiplier = multiplier
+
             Task { @MainActor in
+                let displayRange = self.allowedDisplayZoomRange(for: camera, multiplier: multiplier)
+                self.displayZoomFactor = camera.videoZoomFactor * multiplier
+                self.minDisplayZoomFactor = displayRange.lowerBound
+                self.maxDisplayZoomFactor = displayRange.upperBound
+                if #available(iOS 18.0, *) {
+                    self.supportsQuietCapture = self.photoOutput.isShutterSoundSuppressionSupported
+                } else {
+                    self.supportsQuietCapture = false
+                }
                 self.isConfigured = true
             }
         }
+    }
+
+    nonisolated private func preferredBackCamera() -> AVCaptureDevice? {
+        let deviceTypes: [AVCaptureDevice.DeviceType] = [
+            .builtInTripleCamera,
+            .builtInDualWideCamera,
+            .builtInDualCamera,
+            .builtInWideAngleCamera
+        ]
+
+        for deviceType in deviceTypes {
+            if let device = AVCaptureDevice.default(deviceType, for: .video, position: .back) {
+                return device
+            }
+        }
+
+        return nil
+    }
+
+    nonisolated private func allowedDisplayZoomRange(
+        for camera: AVCaptureDevice,
+        multiplier: CGFloat
+    ) -> ClosedRange<CGFloat> {
+        let minDisplayZoom = camera.minAvailableVideoZoomFactor * multiplier
+        let rawMaxDisplayZoom = camera.maxAvailableVideoZoomFactor * multiplier
+        let cappedMaxDisplayZoom = min(rawMaxDisplayZoom, 8)
+        return minDisplayZoom...max(minDisplayZoom, cappedMaxDisplayZoom)
     }
 }
 

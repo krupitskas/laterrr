@@ -41,6 +41,19 @@ struct SettingsView: View {
                             }
                             .tint(LaterrrPalette.accent)
 
+                            Toggle(isOn: $settingsStore.enableLookAroundVerification) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Improve matches with Look Around")
+                                        .font(.system(.headline, design: .rounded))
+                                        .foregroundStyle(LaterrrPalette.textPrimary)
+
+                                    Text("When Apple street-level imagery exists, Laterrr compares it to your photo and shows the visual preview in the ranking.")
+                                        .font(.system(.subheadline, design: .rounded))
+                                        .foregroundStyle(LaterrrPalette.textSecondary)
+                                }
+                            }
+                            .tint(LaterrrPalette.accent)
+
                             Toggle(isOn: $settingsStore.autoOpenMapAfterSave) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Open the map provider right after saving")
@@ -61,7 +74,7 @@ struct SettingsView: View {
                             .font(.system(.title3, design: .rounded, weight: .bold))
                             .foregroundStyle(LaterrrPalette.textPrimary)
 
-                        Text("Laterrr stays local: on-device OCR plus deterministic nearby-place matching.")
+                        Text("Laterrr stays local: on-device OCR plus deterministic nearby-place matching, with optional Look Around verification where Apple has coverage.")
                             .font(.system(.body, design: .rounded))
                             .foregroundStyle(LaterrrPalette.textPrimary)
 

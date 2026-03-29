@@ -18,6 +18,7 @@
 		839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E64CD3654264C9E1323B351 /* SavedPlace.swift */; };
 		86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */; };
 		93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745887AE56C482E44422E82E /* CaptureView.swift */; };
+		96AFCFAB74CB183F6EE879CF /* LookAroundVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */; };
 		9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251D4DCD245919DF391337EC /* LaterrrApp.swift */; };
 		9ED48515FCA571A2FDECD6AF /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6CF5903E018CB0E839C583 /* SettingsStore.swift */; };
 		BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E54173E655D3C7D69B2BDC67 /* RootView.swift */; };
@@ -53,6 +54,7 @@
 		5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyVenueSearcher.swift; sourceTree = "<group>"; };
 		6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlaceDetailView.swift; sourceTree = "<group>"; };
 		745887AE56C482E44422E82E /* CaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureView.swift; sourceTree = "<group>"; };
+		7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookAroundVerifier.swift; sourceTree = "<group>"; };
 		86D3B8AA1B47A9B4A175E3F3 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueTextRecognizer.swift; sourceTree = "<group>"; };
 		8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesListView.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 			children = (
 				9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */,
 				FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */,
+				7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */,
 				3126750A6288313C256DBDB5 /* MapsExporter.swift */,
 				5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */,
 				A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */,
@@ -261,6 +264,7 @@
 				9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */,
 				601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */,
 				FB04DF3047B4542B3600B0F6 /* LocationStore.swift in Sources */,
+				96AFCFAB74CB183F6EE879CF /* LookAroundVerifier.swift in Sources */,
 				D739E2145AEFFAFFF6B0A404 /* MapProvider.swift in Sources */,
 				74E74CC34199D25E59BFD4B8 /* MapsExporter.swift in Sources */,
 				D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */,
@@ -318,7 +322,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.krupitskas.laterrr;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.Laterrr;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -504,7 +508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.krupitskas.laterrr;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.Laterrr;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";

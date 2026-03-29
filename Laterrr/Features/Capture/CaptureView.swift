@@ -8,6 +8,7 @@ struct CaptureView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = CaptureViewModel()
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var pinchBaseZoomFactor: CGFloat?
 
     var body: some View {
         ZStack {
@@ -29,7 +30,10 @@ struct CaptureView: View {
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
         .onChange(of: selectedPhotoItem) { _, newValue in
-            viewModel.importPhoto(from: newValue)
+            viewModel.importPhoto(
+                from: newValue,
+                enableLookAroundVerification: settingsStore.enableLookAroundVerification
+            )
         }
         .sheet(item: $viewModel.reviewState) { reviewState in
             CaptureReviewSheet(
@@ -83,6 +87,13 @@ struct CaptureView: View {
         if viewModel.cameraSession.authorizationStatus == .authorized, viewModel.cameraSession.isConfigured {
             CameraPreviewView(session: viewModel.cameraSession.session)
                 .ignoresSafeArea()
+                .overlay(alignment: .topTrailing) {
+                    zoomBadge
+                        .padding(.top, 18)
+                        .padding(.trailing, 18)
+                }
+                .contentShape(Rectangle())
+                .gesture(cameraZoomGesture)
         } else {
             VStack(spacing: 20) {
                 Image(systemName: "camera.macro")
@@ -124,6 +135,24 @@ struct CaptureView: View {
                         title: "Local OCR",
                         systemImage: "text.viewfinder"
                     )
+
+                    if viewModel.cameraSession.supportsQuietCapture {
+                        statusChip(
+                            title: "Quiet capture",
+                            systemImage: "speaker.slash"
+                        )
+                    }
+
+                    if settingsStore.enableLookAroundVerification {
+                        statusChip(
+                            title: "Look Around",
+                            systemImage: "binoculars"
+                        )
+                    }
+                }
+
+                if viewModel.cameraSession.canZoom {
+                    zoomControls
                 }
 
                 HStack(spacing: 12) {
@@ -134,7 +163,9 @@ struct CaptureView: View {
                     .buttonStyle(.glass)
 
                     Button {
-                        viewModel.capture()
+                        viewModel.capture(
+                            enableLookAroundVerification: settingsStore.enableLookAroundVerification
+                        )
                     } label: {
                         Label("Capture", systemImage: "camera.shutter.button")
                             .frame(maxWidth: .infinity)
@@ -147,6 +178,55 @@ struct CaptureView: View {
                     .font(.system(.footnote, design: .rounded))
                     .foregroundStyle(LaterrrPalette.textSecondary)
             }
+        }
+    }
+
+    private var zoomControls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Zoom", systemImage: "plus.magnifyingglass")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+
+                Spacer()
+
+                Text("\(formattedZoom(viewModel.cameraSession.displayZoomFactor, decimals: 1))x")
+                    .font(.system(.subheadline, design: .rounded, weight: .bold))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+            }
+
+            Slider(
+                value: Binding(
+                    get: { viewModel.cameraSession.displayZoomFactor },
+                    set: { viewModel.cameraSession.setDisplayZoomFactor($0) }
+                ),
+                in: viewModel.cameraSession.minDisplayZoomFactor...viewModel.cameraSession.maxDisplayZoomFactor
+            )
+            .tint(LaterrrPalette.accent)
+
+            HStack(spacing: 8) {
+                ForEach(zoomPresetFactors, id: \.self) { factor in
+                    Button {
+                        viewModel.cameraSession.setDisplayZoomFactor(factor)
+                    } label: {
+                        Text("\(formattedZoom(factor, decimals: factor < 1 ? 1 : 0))x")
+                            .font(.system(.footnote, design: .rounded, weight: .semibold))
+                            .foregroundStyle(isCurrentZoomPreset(factor) ? Color.white : LaterrrPalette.textPrimary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(isCurrentZoomPreset(factor) ? LaterrrPalette.accent : Color.white.opacity(0.44))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Text("Pinch anywhere on the preview to zoom faster.")
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(LaterrrPalette.textSecondary)
         }
     }
 
@@ -163,7 +243,9 @@ struct CaptureView: View {
                         .font(.system(.headline, design: .rounded))
                         .foregroundStyle(LaterrrPalette.textPrimary)
 
-                    Text("Laterrr is reading the sign, checking nearby places, and trimming anything that looks too far away.")
+                    Text(settingsStore.enableLookAroundVerification
+                         ? "Laterrr is reading the sign, checking nearby places, and verifying strong candidates with Look Around where available."
+                         : "Laterrr is reading the sign, checking nearby places, and trimming anything that looks too far away.")
                         .font(.system(.body, design: .rounded))
                         .foregroundStyle(LaterrrPalette.textSecondary)
                         .multilineTextAlignment(.center)
@@ -206,6 +288,68 @@ struct CaptureView: View {
             Capsule()
                 .strokeBorder(Color.white.opacity(0.76), lineWidth: 1)
         }
+    }
+
+    private var zoomBadge: some View {
+        Text("\(formattedZoom(viewModel.cameraSession.displayZoomFactor, decimals: 1))x")
+            .font(.system(.subheadline, design: .rounded, weight: .bold))
+            .foregroundStyle(LaterrrPalette.textPrimary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .glassEffect(
+                Glass.regular.tint(Color.white.opacity(0.72)),
+                in: Capsule()
+            )
+            .overlay {
+                Capsule()
+                    .strokeBorder(Color.white.opacity(0.80), lineWidth: 1)
+            }
+    }
+
+    private var zoomPresetFactors: [CGFloat] {
+        let candidates: [CGFloat] = [
+            viewModel.cameraSession.minDisplayZoomFactor,
+            1,
+            2,
+            3,
+            5
+        ]
+
+        var seen = Set<Int>()
+
+        return candidates
+            .filter { factor in
+                factor >= viewModel.cameraSession.minDisplayZoomFactor - 0.05
+                    && factor <= viewModel.cameraSession.maxDisplayZoomFactor + 0.05
+            }
+            .filter { factor in
+                let key = Int((factor * 10).rounded())
+                return seen.insert(key).inserted
+            }
+            .sorted()
+    }
+
+    private var cameraZoomGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { scale in
+                let baseZoomFactor = pinchBaseZoomFactor ?? viewModel.cameraSession.displayZoomFactor
+                if pinchBaseZoomFactor == nil {
+                    pinchBaseZoomFactor = baseZoomFactor
+                }
+
+                viewModel.cameraSession.setDisplayZoomFactor(baseZoomFactor * scale)
+            }
+            .onEnded { _ in
+                pinchBaseZoomFactor = nil
+            }
+    }
+
+    private func isCurrentZoomPreset(_ factor: CGFloat) -> Bool {
+        abs(viewModel.cameraSession.displayZoomFactor - factor) < 0.15
+    }
+
+    private func formattedZoom(_ factor: CGFloat, decimals: Int) -> String {
+        Double(factor).formatted(.number.precision(.fractionLength(decimals)))
     }
 }
 
@@ -307,6 +451,8 @@ private struct CaptureReviewSheet: View {
                                         .font(.system(.subheadline, design: .rounded))
                                         .foregroundStyle(LaterrrPalette.textSecondary)
 
+                                    LookAroundSection(preview: suggestion.lookAroundPreview)
+
                                     HStack(spacing: 12) {
                                         Button {
                                             saveAction(suggestion)
@@ -362,6 +508,97 @@ private struct CaptureReviewSheet: View {
                 }
                 .padding(16)
             }
+    }
+}
+
+private struct LookAroundSection: View {
+    let preview: LookAroundPreview
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Look Around", systemImage: "binoculars")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+
+                Spacer()
+
+                if let verificationScore = preview.verificationScore {
+                    Text("\(Int((verificationScore * 100).rounded()))%")
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .foregroundStyle(LaterrrPalette.textPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(LaterrrPalette.accentSoft.opacity(0.72))
+                        )
+                } else {
+                    Text(preview.availability.title)
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .foregroundStyle(LaterrrPalette.textPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color.white.opacity(0.52))
+                        )
+                }
+            }
+
+            if let snapshotData = preview.snapshotData, let image = UIImage(data: snapshotData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 150)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            } else {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Color.white.opacity(0.34))
+                    .frame(height: 120)
+                    .overlay {
+                        VStack(spacing: 8) {
+                            Image(systemName: preview.availability == .disabled ? "binoculars.slash" : "eye.slash")
+                                .font(.system(size: 28, weight: .semibold))
+                                .foregroundStyle(LaterrrPalette.textSecondary)
+
+                            Text(preview.availability == .disabled ? "Look Around off" : "Not available here")
+                                .font(.system(.headline, design: .rounded))
+                                .foregroundStyle(LaterrrPalette.textPrimary)
+                        }
+                    }
+            }
+
+            Text(preview.summary)
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(LaterrrPalette.textSecondary)
+
+            if !preview.matchedTokens.isEmpty {
+                HStack(spacing: 6) {
+                    ForEach(preview.matchedTokens, id: \.self) { token in
+                        Text(token)
+                            .font(.system(.caption, design: .rounded, weight: .semibold))
+                            .foregroundStyle(LaterrrPalette.textPrimary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.white.opacity(0.5))
+                            )
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.white.opacity(0.36))
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.72), lineWidth: 1)
+        }
     }
 }
 

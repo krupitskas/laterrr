@@ -1,6 +1,47 @@
 import CoreLocation
 import Foundation
 
+enum LookAroundAvailability: String, Sendable {
+    case available
+    case unavailable
+    case disabled
+
+    var title: String {
+        switch self {
+        case .available:
+            return "Available"
+        case .unavailable:
+            return "Not available"
+        case .disabled:
+            return "Disabled"
+        }
+    }
+}
+
+struct LookAroundPreview: Sendable {
+    let availability: LookAroundAvailability
+    let snapshotData: Data?
+    let verificationScore: Double?
+    let matchedTokens: [String]
+    let summary: String
+
+    static let disabled = LookAroundPreview(
+        availability: .disabled,
+        snapshotData: nil,
+        verificationScore: nil,
+        matchedTokens: [],
+        summary: "Look Around verification is turned off in Settings."
+    )
+
+    static let unavailable = LookAroundPreview(
+        availability: .unavailable,
+        snapshotData: nil,
+        verificationScore: nil,
+        matchedTokens: [],
+        summary: "Look Around is not available for this place."
+    )
+}
+
 struct VenueCandidate: Identifiable {
     let id: String
     let name: String
@@ -23,6 +64,7 @@ struct PlaceSuggestion: Identifiable {
     var score: Double
     var rationale: String
     var matchedTokens: [String]
+    var lookAroundPreview: LookAroundPreview = .disabled
 
     var id: String { candidate.id }
     var name: String { candidate.name }

@@ -41,18 +41,21 @@ final class CaptureViewModel: ObservableObject {
         cameraSession.stopRunning()
     }
 
-    func capture() {
+    func capture(enableLookAroundVerification: Bool) {
         Task {
             do {
                 let photo = try await cameraSession.capturePhoto()
-                await analyze(photo: photo)
+                await analyze(
+                    photo: photo,
+                    enableLookAroundVerification: enableLookAroundVerification
+                )
             } catch {
                 alertMessage = error.localizedDescription
             }
         }
     }
 
-    func importPhoto(from item: PhotosPickerItem?) {
+    func importPhoto(from item: PhotosPickerItem?, enableLookAroundVerification: Bool) {
         guard let item else { return }
 
         Task {
@@ -65,7 +68,10 @@ final class CaptureViewModel: ObservableObject {
             }
 
             let photo = CapturedPhoto(image: image, data: data)
-            await analyze(photo: photo)
+            await analyze(
+                photo: photo,
+                enableLookAroundVerification: enableLookAroundVerification
+            )
         }
     }
 
@@ -103,13 +109,14 @@ final class CaptureViewModel: ObservableObject {
         reviewState = nil
     }
 
-    private func analyze(photo: CapturedPhoto) async {
+    private func analyze(photo: CapturedPhoto, enableLookAroundVerification: Bool) async {
         isAnalyzing = true
         bannerMessage = nil
 
         let analysis = await PlaceCapturePipeline.analyze(
             photoData: photo.data,
-            location: locationStore.currentLocation
+            location: locationStore.currentLocation,
+            enableLookAroundVerification: enableLookAroundVerification
         )
 
         reviewState = CaptureReviewState(photo: photo, analysis: analysis)

@@ -10,6 +10,10 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(keepPhotoSnapshot, forKey: Keys.keepPhotoSnapshot) }
     }
 
+    @Published var enableLookAroundVerification: Bool {
+        didSet { defaults.set(enableLookAroundVerification, forKey: Keys.enableLookAroundVerification) }
+    }
+
     @Published var autoOpenMapAfterSave: Bool {
         didSet { defaults.set(autoOpenMapAfterSave, forKey: Keys.autoOpenMapAfterSave) }
     }
@@ -20,6 +24,7 @@ final class SettingsStore: ObservableObject {
         self.defaults = defaults
         self.preferredMapsProvider = MapProvider(rawValue: defaults.string(forKey: Keys.preferredMapsProvider) ?? "") ?? .appleMaps
         self.keepPhotoSnapshot = defaults.object(forKey: Keys.keepPhotoSnapshot) as? Bool ?? true
+        self.enableLookAroundVerification = defaults.object(forKey: Keys.enableLookAroundVerification) as? Bool ?? true
         self.autoOpenMapAfterSave = defaults.object(forKey: Keys.autoOpenMapAfterSave) as? Bool ?? false
     }
 }
@@ -27,5 +32,6 @@ final class SettingsStore: ObservableObject {
 private enum Keys {
     static let preferredMapsProvider = "preferredMapsProvider"
     static let keepPhotoSnapshot = "keepPhotoSnapshot"
+    static let enableLookAroundVerification = "enableLookAroundVerification"
     static let autoOpenMapAfterSave = "autoOpenMapAfterSave"
 }
