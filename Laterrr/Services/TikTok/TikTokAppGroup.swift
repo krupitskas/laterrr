@@ -1,7 +1,7 @@
 import Foundation
 
 enum TikTokAppGroup {
-    static let identifier = "group.com.example.Laterrr.shared"
+    static let identifier = "group.co.amo.com.example.Laterrr.shared"
     static let pendingImportsKey = "pendingTikTokImports"
 }
 
