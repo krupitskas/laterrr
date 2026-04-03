@@ -15,16 +15,15 @@ struct PlacesListView: View {
                     EmptyStateView(
                         title: "Your saved places land here",
                         message: "Capture a storefront, confirm the best guess, and it shows up here across your devices once iCloud is set up.",
-                        systemImage: "bookmark.circle"
+                        systemImage: "cup.and.saucer.fill"
                     )
                     .padding(20)
                 }
+                .scrollIndicators(.hidden)
             } else {
                 List {
                     ForEach(filteredPlaces) { place in
-                        NavigationLink {
-                            SavedPlaceDetailView(place: place)
-                        } label: {
+                        NavigationLink(value: place.id) {
                             SavedPlaceRow(place: place)
                         }
                         .listRowSeparator(.hidden)
@@ -35,6 +34,7 @@ struct PlacesListView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
             }
         }
         .navigationTitle("Places")
@@ -79,7 +79,7 @@ private struct SavedPlaceRow: View {
                         .fill(LaterrrPalette.accentSoft.opacity(0.55))
                         .frame(width: 78, height: 78)
                         .overlay {
-                            Image(systemName: "fork.knife.circle.fill")
+                            Image(systemName: "cup.and.saucer.fill")
                                 .font(.system(size: 28))
                                 .foregroundStyle(LaterrrPalette.textPrimary)
                         }
@@ -90,22 +90,16 @@ private struct SavedPlaceRow: View {
                         Text(place.name)
                             .font(.system(.headline, design: .rounded, weight: .bold))
                             .foregroundStyle(LaterrrPalette.textPrimary)
-
-                        Spacer()
-
-                        ConfidencePill(score: place.confidence)
                     }
 
                     Text(place.shortAddress)
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(LaterrrPalette.textSecondary)
 
-                    HStack(spacing: 12) {
-                        Label(place.category, systemImage: "fork.knife")
-                        Label(place.createdAt.formatted(date: .abbreviated, time: .omitted), systemImage: "clock")
+                    HStack(spacing: 8) {
+                        LaterrrTag(title: place.source.title)
+                        LaterrrTag(title: place.createdAt.formatted(date: .abbreviated, time: .omitted))
                     }
-                    .font(.system(.caption, design: .rounded, weight: .semibold))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
                 }
             }
         }

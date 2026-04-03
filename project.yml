@@ -25,6 +25,11 @@ targets:
       - path: Laterrr
         excludes:
           - Resources/Assets.xcassets
+    resources:
+      - path: Laterrr/Resources
+    dependencies:
+      - target: LaterrrShareExtension
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.Laterrr
@@ -47,6 +52,24 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         CODE_SIGN_ENTITLEMENTS: Laterrr/Laterrr.entitlements
+        SUPPORTS_MACCATALYST: NO
+
+  LaterrrShareExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: LaterrrShareExtension
+      - path: Laterrr/Services/TikTok
+        includes:
+          - TikTokAppGroup.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.Laterrr.ShareExtension
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: LaterrrShareExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: LaterrrShareExtension/LaterrrShareExtension.entitlements
+        APPLICATION_EXTENSION_API_ONLY: YES
         SUPPORTS_MACCATALYST: NO
 
   LaterrrTests:

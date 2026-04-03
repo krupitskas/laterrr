@@ -2,3 +2,4 @@
 .derivedData/
 xcuserdata/
 *.xcuserstate
+.clang-module-cache

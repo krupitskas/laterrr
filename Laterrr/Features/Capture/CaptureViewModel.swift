@@ -93,6 +93,7 @@ final class CaptureViewModel: ObservableObject {
             matchedText: currentReviewState.analysis.extractedText.joined(separator: ", "),
             selectionReason: suggestion.rationale,
             analysisMode: currentReviewState.analysis.analysisMethod,
+            source: .camera,
             websiteURLString: suggestion.websiteURL?.absoluteString,
             photoData: settings.keepPhotoSnapshot ? currentReviewState.photo.data : nil
         )
@@ -101,10 +102,6 @@ final class CaptureViewModel: ObservableObject {
         try? modelContext.save()
 
         bannerMessage = "Saved \(suggestion.name) to Laterrr."
-
-        if settings.autoOpenMapAfterSave {
-            MapsExporter.open(url: MapsExporter.url(for: suggestion, provider: settings.preferredMapsProvider))
-        }
 
         reviewState = nil
     }

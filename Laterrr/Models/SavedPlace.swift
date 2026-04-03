@@ -16,6 +16,7 @@ final class SavedPlace {
     var matchedText: String
     var selectionReason: String
     var analysisMode: String
+    var sourceRawValue: String
     var websiteURLString: String?
 
     @Attribute(.externalStorage) var photoData: Data?
@@ -33,6 +34,7 @@ final class SavedPlace {
         matchedText: String,
         selectionReason: String,
         analysisMode: String,
+        source: SavedPlaceSource = .camera,
         websiteURLString: String? = nil,
         photoData: Data? = nil
     ) {
@@ -48,6 +50,7 @@ final class SavedPlace {
         self.matchedText = matchedText
         self.selectionReason = selectionReason
         self.analysisMode = analysisMode
+        self.sourceRawValue = source.rawValue
         self.websiteURLString = websiteURLString
         self.photoData = photoData
     }
@@ -62,5 +65,10 @@ final class SavedPlace {
         }
 
         return URL(string: websiteURLString)
+    }
+
+    var source: SavedPlaceSource {
+        get { SavedPlaceSource(rawValue: sourceRawValue) ?? .camera }
+        set { sourceRawValue = newValue.rawValue }
     }
 }

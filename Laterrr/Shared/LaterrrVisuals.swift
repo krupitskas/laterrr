@@ -116,3 +116,19 @@ struct EmptyStateView: View {
         }
     }
 }
+
+struct LaterrrTag: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.system(.caption, design: .rounded, weight: .semibold))
+            .foregroundStyle(LaterrrPalette.textSecondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(Color.white.opacity(0.58))
+            )
+    }
+}

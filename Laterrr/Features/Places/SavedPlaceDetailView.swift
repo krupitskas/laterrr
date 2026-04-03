@@ -2,8 +2,6 @@ import MapKit
 import SwiftUI
 
 struct SavedPlaceDetailView: View {
-    @EnvironmentObject private var settingsStore: SettingsStore
-
     let place: SavedPlace
 
     var body: some View {
@@ -32,19 +30,12 @@ struct SavedPlaceDetailView: View {
                                     .font(.system(.body, design: .rounded))
                                     .foregroundStyle(LaterrrPalette.textSecondary)
                             }
-
-                            Spacer()
-
-                            ConfidencePill(score: place.confidence)
                         }
 
-                        HStack(spacing: 12) {
-                            Label(place.category, systemImage: "fork.knife")
-                            Label(place.analysisMode, systemImage: "text.viewfinder")
-                            Label(place.createdAt.formatted(date: .abbreviated, time: .shortened), systemImage: "clock")
+                        HStack(spacing: 8) {
+                            LaterrrTag(title: place.source.title)
+                            LaterrrTag(title: place.createdAt.formatted(date: .abbreviated, time: .shortened))
                         }
-                        .font(.system(.caption, design: .rounded, weight: .semibold))
-                        .foregroundStyle(LaterrrPalette.textSecondary)
 
                         Text(place.selectionReason)
                             .font(.system(.headline, design: .rounded))
@@ -75,26 +66,26 @@ struct SavedPlaceDetailView: View {
                     }
 
                     GlassCard {
-                        Text("Next step")
+                        Text("Apple Maps")
                             .font(.system(.title3, design: .rounded, weight: .bold))
                             .foregroundStyle(LaterrrPalette.textPrimary)
 
-                        Text("Open this place in \(settingsStore.preferredMapsProvider.title), or share the location with someone else.")
+                        Text("Open this place in Apple Maps, or share the location with someone else.")
                             .font(.system(.body, design: .rounded))
                             .foregroundStyle(LaterrrPalette.textSecondary)
 
                         HStack(spacing: 12) {
                             Button {
                                 MapsExporter.open(
-                                    url: MapsExporter.url(for: place, provider: settingsStore.preferredMapsProvider)
+                                    url: MapsExporter.url(for: place)
                                 )
                             } label: {
-                                Label(settingsStore.preferredMapsProvider.title, systemImage: settingsStore.preferredMapsProvider.systemImage)
+                                Label("Apple Maps", systemImage: "map")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.glassProminent)
 
-                            if let exportURL = MapsExporter.url(for: place, provider: settingsStore.preferredMapsProvider) {
+                            if let exportURL = MapsExporter.url(for: place) {
                                 ShareLink(item: exportURL) {
                                     Label("Share", systemImage: "square.and.arrow.up")
                                         .frame(maxWidth: .infinity)
@@ -114,6 +105,7 @@ struct SavedPlaceDetailView: View {
                 }
                 .padding(20)
             }
+            .scrollIndicators(.hidden)
         }
         .navigationTitle(place.name)
         .navigationBarTitleDisplayMode(.inline)

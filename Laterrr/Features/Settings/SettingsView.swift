@@ -10,23 +10,6 @@ struct SettingsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     GlassCard {
-                        Text("Default map")
-                            .font(.system(.title3, design: .rounded, weight: .bold))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-
-                        Picker("Maps Provider", selection: $settingsStore.preferredMapsProvider) {
-                            ForEach(MapProvider.allCases) { provider in
-                                Text(provider.title).tag(provider)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-
-                        Text(settingsStore.preferredMapsProvider.summary)
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(LaterrrPalette.textSecondary)
-                    }
-
-                    GlassCard {
                         VStack(alignment: .leading, spacing: 14) {
                             Toggle(isOn: $settingsStore.keepPhotoSnapshot) {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -41,6 +24,21 @@ struct SettingsView: View {
                             }
                             .tint(LaterrrPalette.accent)
 
+                            Toggle(isOn: .constant(false)) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Save to iCloud")
+                                        .font(.system(.headline, design: .rounded))
+                                        .foregroundStyle(LaterrrPalette.textPrimary)
+
+                                    Text("Stub for a future manual sync toggle. The current data container setup still handles storage automatically.")
+                                        .font(.system(.subheadline, design: .rounded))
+                                        .foregroundStyle(LaterrrPalette.textSecondary)
+                                }
+                            }
+                            .tint(LaterrrPalette.accent)
+                            .disabled(true)
+                            .opacity(0.58)
+
                             Toggle(isOn: $settingsStore.enableLookAroundVerification) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Improve matches with Look Around")
@@ -54,41 +52,12 @@ struct SettingsView: View {
                             }
                             .tint(LaterrrPalette.accent)
 
-                            Toggle(isOn: $settingsStore.autoOpenMapAfterSave) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Open the map provider right after saving")
-                                        .font(.system(.headline, design: .rounded))
-                                        .foregroundStyle(LaterrrPalette.textPrimary)
-
-                                    Text("Useful when you want directions or the full place card immediately.")
-                                        .font(.system(.subheadline, design: .rounded))
-                                        .foregroundStyle(LaterrrPalette.textSecondary)
-                                }
-                            }
-                            .tint(LaterrrPalette.accent)
                         }
-                    }
-
-                    GlassCard {
-                        Text("Matching engine")
-                            .font(.system(.title3, design: .rounded, weight: .bold))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-
-                        Text("Laterrr stays local: on-device OCR plus deterministic nearby-place matching, with optional Look Around verification where Apple has coverage.")
-                            .font(.system(.body, design: .rounded))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-
-                        Text(VenueMatcher.matchingSummary())
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(LaterrrPalette.textSecondary)
-
-                        Text("This keeps the core flow consistent in Europe and avoids depending on region-limited intelligence features.")
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(LaterrrPalette.textSecondary)
                     }
                 }
                 .padding(20)
             }
+            .scrollIndicators(.hidden)
         }
         .navigationTitle("Settings")
     }

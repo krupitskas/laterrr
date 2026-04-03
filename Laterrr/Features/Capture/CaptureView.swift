@@ -47,7 +47,7 @@ struct CaptureView: View {
                     )
                 },
                 openAction: { suggestion in
-                    MapsExporter.open(url: MapsExporter.url(for: suggestion, provider: settingsStore.preferredMapsProvider))
+                    MapsExporter.open(url: MapsExporter.url(for: suggestion))
                 }
             )
             .presentationDetents([.large])
@@ -87,16 +87,11 @@ struct CaptureView: View {
         if viewModel.cameraSession.authorizationStatus == .authorized, viewModel.cameraSession.isConfigured {
             CameraPreviewView(session: viewModel.cameraSession.session)
                 .ignoresSafeArea()
-                .overlay(alignment: .topTrailing) {
-                    zoomBadge
-                        .padding(.top, 18)
-                        .padding(.trailing, 18)
-                }
                 .contentShape(Rectangle())
                 .gesture(cameraZoomGesture)
         } else {
             VStack(spacing: 20) {
-                Image(systemName: "camera.macro")
+                Image(systemName: "cup.and.saucer.fill")
                     .font(.system(size: 62, weight: .semibold))
                     .foregroundStyle(LaterrrPalette.accent)
 
@@ -123,110 +118,59 @@ struct CaptureView: View {
     }
 
     private var captureControls: some View {
-        GlassEffectContainer(spacing: 14) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 10) {
-                    statusChip(
-                        title: locationStatusTitle,
-                        systemImage: "location.viewfinder"
+        HStack(spacing: 18) {
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    .frame(width: 56, height: 56)
+                    .glassEffect(
+                        Glass.regular.tint(Color.white.opacity(0.68)),
+                        in: Circle()
                     )
-
-                    statusChip(
-                        title: "Local OCR",
-                        systemImage: "text.viewfinder"
-                    )
-
-                    if viewModel.cameraSession.supportsQuietCapture {
-                        statusChip(
-                            title: "Quiet capture",
-                            systemImage: "speaker.slash"
-                        )
+                    .overlay {
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
                     }
-
-                    if settingsStore.enableLookAroundVerification {
-                        statusChip(
-                            title: "Look Around",
-                            systemImage: "binoculars"
-                        )
-                    }
-                }
-
-                if viewModel.cameraSession.canZoom {
-                    zoomControls
-                }
-
-                HStack(spacing: 12) {
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                        Label("Library", systemImage: "photo.on.rectangle")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.glass)
-
-                    Button {
-                        viewModel.capture(
-                            enableLookAroundVerification: settingsStore.enableLookAroundVerification
-                        )
-                    } label: {
-                        Label("Capture", systemImage: "camera.shutter.button")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.glassProminent)
-                    .disabled(viewModel.cameraSession.authorizationStatus != .authorized)
-                }
-
-                Text("Saved places sync with iCloud, and \(settingsStore.preferredMapsProvider.title) opens as your default map handoff.")
-                    .font(.system(.footnote, design: .rounded))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
             }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Button {
+                viewModel.capture(
+                    enableLookAroundVerification: settingsStore.enableLookAroundVerification
+                )
+            } label: {
+                ZStack {
+                    Circle()
+                        .strokeBorder(Color.white.opacity(0.92), lineWidth: 6)
+                        .frame(width: 82, height: 82)
+
+                    Circle()
+                        .fill(Color.white.opacity(0.98))
+                        .frame(width: 64, height: 64)
+                }
+                .shadow(color: Color.black.opacity(0.16), radius: 18, y: 10)
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.cameraSession.authorizationStatus != .authorized)
+
+            Spacer()
+
+            Circle()
+                .fill(Color.clear)
+                .frame(width: 56, height: 56)
         }
-    }
-
-    private var zoomControls: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Label("Zoom", systemImage: "plus.magnifyingglass")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-
-                Spacer()
-
-                Text("\(formattedZoom(viewModel.cameraSession.displayZoomFactor, decimals: 1))x")
-                    .font(.system(.subheadline, design: .rounded, weight: .bold))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-            }
-
-            Slider(
-                value: Binding(
-                    get: { viewModel.cameraSession.displayZoomFactor },
-                    set: { viewModel.cameraSession.setDisplayZoomFactor($0) }
-                ),
-                in: viewModel.cameraSession.minDisplayZoomFactor...viewModel.cameraSession.maxDisplayZoomFactor
-            )
-            .tint(LaterrrPalette.accent)
-
-            HStack(spacing: 8) {
-                ForEach(zoomPresetFactors, id: \.self) { factor in
-                    Button {
-                        viewModel.cameraSession.setDisplayZoomFactor(factor)
-                    } label: {
-                        Text("\(formattedZoom(factor, decimals: factor < 1 ? 1 : 0))x")
-                            .font(.system(.footnote, design: .rounded, weight: .semibold))
-                            .foregroundStyle(isCurrentZoomPreset(factor) ? Color.white : LaterrrPalette.textPrimary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(isCurrentZoomPreset(factor) ? LaterrrPalette.accent : Color.white.opacity(0.44))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            Text("Pinch anywhere on the preview to zoom faster.")
-                .font(.system(.footnote, design: .rounded))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
+        .glassEffect(
+            Glass.regular.tint(Color.white.opacity(0.34)),
+            in: Capsule(style: .continuous)
+        )
+        .overlay {
+            Capsule(style: .continuous)
+                .strokeBorder(Color.white.opacity(0.62), lineWidth: 1)
         }
     }
 
@@ -255,80 +199,6 @@ struct CaptureView: View {
             }
     }
 
-    private var locationStatusTitle: String {
-        switch viewModel.locationStore.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            if viewModel.locationStore.currentLocation == nil {
-                return "Finding your spot"
-            }
-            return "Nearby matching ready"
-        case .denied, .restricted:
-            return "Photo-only mode"
-        case .notDetermined:
-            return "Checking location"
-        @unknown default:
-            return "Location pending"
-        }
-    }
-
-    private func statusChip(title: String, systemImage: String) -> some View {
-        HStack(spacing: 7) {
-            Image(systemName: systemImage)
-            Text(title)
-        }
-        .font(.system(.footnote, design: .rounded, weight: .semibold))
-        .foregroundStyle(LaterrrPalette.textPrimary)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .glassEffect(
-            Glass.regular.tint(Color.white.opacity(0.62)),
-            in: Capsule()
-        )
-        .overlay {
-            Capsule()
-                .strokeBorder(Color.white.opacity(0.76), lineWidth: 1)
-        }
-    }
-
-    private var zoomBadge: some View {
-        Text("\(formattedZoom(viewModel.cameraSession.displayZoomFactor, decimals: 1))x")
-            .font(.system(.subheadline, design: .rounded, weight: .bold))
-            .foregroundStyle(LaterrrPalette.textPrimary)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .glassEffect(
-                Glass.regular.tint(Color.white.opacity(0.72)),
-                in: Capsule()
-            )
-            .overlay {
-                Capsule()
-                    .strokeBorder(Color.white.opacity(0.80), lineWidth: 1)
-            }
-    }
-
-    private var zoomPresetFactors: [CGFloat] {
-        let candidates: [CGFloat] = [
-            viewModel.cameraSession.minDisplayZoomFactor,
-            1,
-            2,
-            3,
-            5
-        ]
-
-        var seen = Set<Int>()
-
-        return candidates
-            .filter { factor in
-                factor >= viewModel.cameraSession.minDisplayZoomFactor - 0.05
-                    && factor <= viewModel.cameraSession.maxDisplayZoomFactor + 0.05
-            }
-            .filter { factor in
-                let key = Int((factor * 10).rounded())
-                return seen.insert(key).inserted
-            }
-            .sorted()
-    }
-
     private var cameraZoomGesture: some Gesture {
         MagnificationGesture()
             .onChanged { scale in
@@ -342,14 +212,6 @@ struct CaptureView: View {
             .onEnded { _ in
                 pinchBaseZoomFactor = nil
             }
-    }
-
-    private func isCurrentZoomPreset(_ factor: CGFloat) -> Bool {
-        abs(viewModel.cameraSession.displayZoomFactor - factor) < 0.15
-    }
-
-    private func formattedZoom(_ factor: CGFloat, decimals: Int) -> String {
-        Double(factor).formatted(.number.precision(.fractionLength(decimals)))
     }
 }
 
@@ -465,7 +327,7 @@ private struct CaptureReviewSheet: View {
                                         Button {
                                             openAction(suggestion)
                                         } label: {
-                                            Label(settingsStore.preferredMapsProvider.title, systemImage: settingsStore.preferredMapsProvider.systemImage)
+                                            Label("Apple Maps", systemImage: "map")
                                                 .frame(maxWidth: .infinity)
                                         }
                                         .buttonStyle(.glass)
@@ -477,6 +339,7 @@ private struct CaptureReviewSheet: View {
                 }
                 .padding(20)
             }
+            .scrollIndicators(.hidden)
         }
     }
 
@@ -575,19 +438,7 @@ private struct LookAroundSection: View {
                 .foregroundStyle(LaterrrPalette.textSecondary)
 
             if !preview.matchedTokens.isEmpty {
-                HStack(spacing: 6) {
-                    ForEach(preview.matchedTokens, id: \.self) { token in
-                        Text(token)
-                            .font(.system(.caption, design: .rounded, weight: .semibold))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(Color.white.opacity(0.5))
-                            )
-                    }
-                }
+                FlowLayout(preview.matchedTokens)
             }
         }
         .padding(14)

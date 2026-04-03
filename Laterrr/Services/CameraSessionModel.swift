@@ -28,6 +28,8 @@ enum CameraCaptureError: LocalizedError {
 
 @MainActor
 final class CameraSessionModel: NSObject, ObservableObject {
+    nonisolated private static let defaultDisplayZoomFactor: CGFloat = 2
+
     @Published private(set) var authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @Published private(set) var isConfigured = false
     @Published private(set) var displayZoomFactor: CGFloat = 1
@@ -176,8 +178,27 @@ final class CameraSessionModel: NSObject, ObservableObject {
             }
             self.displayZoomMultiplier = multiplier
 
+            let displayRange = self.allowedDisplayZoomRange(for: camera, multiplier: multiplier)
+            let defaultDisplayZoomFactor = min(
+                max(Self.defaultDisplayZoomFactor, displayRange.lowerBound),
+                displayRange.upperBound
+            )
+            let defaultActualZoomFactor = min(
+                max(defaultDisplayZoomFactor / multiplier, camera.minAvailableVideoZoomFactor),
+                camera.maxAvailableVideoZoomFactor
+            )
+
+            do {
+                try camera.lockForConfiguration()
+                camera.videoZoomFactor = defaultActualZoomFactor
+                camera.unlockForConfiguration()
+            } catch {
+                Task { @MainActor in
+                    self.lastError = "Laterrr could not set the default camera zoom."
+                }
+            }
+
             Task { @MainActor in
-                let displayRange = self.allowedDisplayZoomRange(for: camera, multiplier: multiplier)
                 self.displayZoomFactor = camera.videoZoomFactor * multiplier
                 self.minDisplayZoomFactor = displayRange.lowerBound
                 self.maxDisplayZoomFactor = displayRange.upperBound
