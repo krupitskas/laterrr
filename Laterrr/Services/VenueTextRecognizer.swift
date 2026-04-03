@@ -2,10 +2,30 @@ import Foundation
 import ImageIO
 import Vision
 
+struct RecognizedTextObservation: Identifiable, Hashable, Sendable {
+    let id = UUID()
+    let text: String
+    let normalizedTokens: [String]
+    let boundingBox: CGRect
+    let confidence: Float
+}
+
+struct RecognizedTextResult: Sendable {
+    let tokens: [String]
+    let observations: [RecognizedTextObservation]
+
+    static let empty = RecognizedTextResult(tokens: [], observations: [])
+}
+
 enum VenueTextRecognizer {
     private static let queue = DispatchQueue(label: "Laterrr.vision.ocr", qos: .userInitiated)
 
     static func recognizeText(in imageData: Data) async -> [String] {
+        let result = await recognizeDetailedText(in: imageData)
+        return result.tokens
+    }
+
+    static func recognizeDetailedText(in imageData: Data) async -> RecognizedTextResult {
         await withCheckedContinuation { continuation in
             queue.async {
                 let detectedText = performRecognition(in: imageData)
@@ -14,12 +34,12 @@ enum VenueTextRecognizer {
         }
     }
 
-    private static func performRecognition(in imageData: Data) -> [String] {
+    private static func performRecognition(in imageData: Data) -> RecognizedTextResult {
         guard
             let source = CGImageSourceCreateWithData(imageData as CFData, nil),
             let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else {
-            return []
+            return .empty
         }
 
         let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
@@ -36,15 +56,27 @@ enum VenueTextRecognizer {
         do {
             try handler.perform([request])
         } catch {
-            return []
+            return .empty
         }
 
         let observations = request.results ?? []
-        let lines = observations
-            .compactMap { $0.topCandidates(1).first?.string }
-            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        let detailedObservations = observations.compactMap { observation -> RecognizedTextObservation? in
+            guard let candidate = observation.topCandidates(1).first else { return nil }
+            let text = candidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else { return nil }
 
-        return Self.normalizedTokens(from: lines)
+            return RecognizedTextObservation(
+                text: text,
+                normalizedTokens: normalizedTokens(from: [text]),
+                boundingBox: observation.boundingBox,
+                confidence: candidate.confidence
+            )
+        }
+
+        return RecognizedTextResult(
+            tokens: Self.normalizedTokens(from: detailedObservations.map(\.text)),
+            observations: detailedObservations
+        )
     }
 
     static func normalizedTokens(from lines: [String]) -> [String] {
