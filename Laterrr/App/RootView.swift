@@ -9,43 +9,45 @@ struct RootView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var selectedTab: RootTab = .capture
     @State private var placesPath: [UUID] = []
+    @State private var searchPath: [UUID] = []
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
-                SavedPlacesMapView(openPlace: openPlaceFromMap)
+            Tab("Map", systemImage: "map.circle", value: RootTab.map) {
+                NavigationStack {
+                    SavedPlacesMapView(openPlace: openPlaceFromMap)
+                }
             }
-            .tabItem {
-                Label("Map", systemImage: "map.circle")
-            }
-            .tag(RootTab.map)
 
-            NavigationStack(path: $placesPath) {
-                PlacesListView(openPlace: openPlaceFromPlaces)
-                    .navigationDestination(for: UUID.self) { placeID in
-                        placeDestination(for: placeID)
-                    }
+            Tab("Places", systemImage: "cup.and.saucer.fill", value: RootTab.places) {
+                NavigationStack(path: $placesPath) {
+                    PlacesListView(openPlace: openPlaceFromPlaces)
+                        .navigationDestination(for: UUID.self) { placeID in
+                            placeDestination(for: placeID)
+                        }
+                }
             }
-            .tabItem {
-                Label("Places", systemImage: "cup.and.saucer.fill")
-            }
-            .tag(RootTab.places)
 
-            NavigationStack {
-                CaptureView()
+            Tab("Capture", systemImage: "camera.viewfinder", value: RootTab.capture) {
+                NavigationStack {
+                    CaptureView()
+                }
             }
-            .tabItem {
-                Label("Capture", systemImage: "camera.viewfinder")
-            }
-            .tag(RootTab.capture)
 
-            NavigationStack {
-                SettingsView()
+            Tab("Settings", systemImage: "slider.horizontal.3", value: RootTab.settings) {
+                NavigationStack {
+                    SettingsView()
+                }
             }
-            .tabItem {
-                Label("Settings", systemImage: "slider.horizontal.3")
+
+            Tab("Search", systemImage: "magnifyingglass", value: RootTab.search, role: .search) {
+                NavigationStack(path: $searchPath) {
+                    PlacesSearchView(openPlace: openPlaceFromSearch)
+                        .navigationDestination(for: UUID.self) { placeID in
+                            placeDestination(for: placeID)
+                        }
+                }
             }
-            .tag(RootTab.settings)
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(LaterrrPalette.accent)
@@ -114,6 +116,11 @@ struct RootView: View {
         showPlace(place, switchToPlacesTab: false)
     }
 
+    private func openPlaceFromSearch(_ place: SavedPlace) {
+        searchPath = [place.id]
+        selectedTab = .search
+    }
+
     private func showPlace(_ place: SavedPlace, switchToPlacesTab: Bool) {
         placesPath = [place.id]
 
@@ -142,4 +149,5 @@ private enum RootTab: Hashable {
     case places
     case capture
     case settings
+    case search
 }

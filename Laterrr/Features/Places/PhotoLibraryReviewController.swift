@@ -171,24 +171,25 @@ final class PhotoLibraryReviewController: ObservableObject {
         let matchedText = candidate.analysis.extractedText.joined(separator: ", ")
         let reviewedDate = candidate.capturedAt.formatted(date: .abbreviated, time: .shortened)
 
-        let place = SavedPlace(
-            name: suggestion.name,
-            shortAddress: suggestion.shortAddress,
-            fullAddress: suggestion.fullAddress,
-            category: suggestion.category,
-            latitude: suggestion.latitude,
-            longitude: suggestion.longitude,
-            confidence: suggestion.score,
-            matchedText: matchedText,
-            selectionReason: "Reviewed from Photos on \(reviewedDate) and confirmed in laterrr.",
-            analysisMode: "\(candidate.analysis.analysisMethod) + Photos review",
-            source: .photoLibrary,
-            websiteURLString: suggestion.websiteURL?.absoluteString,
-            photoData: candidate.photoData
+        _ = SavedPlaceStore.save(
+            SavedPlaceDraft(
+                name: suggestion.name,
+                shortAddress: suggestion.shortAddress,
+                fullAddress: suggestion.fullAddress,
+                category: suggestion.category,
+                latitude: suggestion.latitude,
+                longitude: suggestion.longitude,
+                createdAt: candidate.capturedAt,
+                confidence: suggestion.score,
+                matchedText: matchedText,
+                selectionReason: "Reviewed from Photos on \(reviewedDate) and confirmed in laterrr.",
+                analysisMode: "\(candidate.analysis.analysisMethod) + Photos review",
+                source: .photoLibrary,
+                websiteURLString: suggestion.websiteURL?.absoluteString,
+                photoData: candidate.photoData
+            ),
+            in: modelContext
         )
-
-        modelContext.insert(place)
-        try? modelContext.save()
 
         removeCurrentCandidate()
     }

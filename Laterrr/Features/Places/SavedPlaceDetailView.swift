@@ -10,25 +10,15 @@ struct SavedPlaceDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    SavedPlacePreviewImage(
-                        place: place,
-                        width: nil,
-                        height: 250,
-                        cornerRadius: 34
-                    )
-                    .frame(maxWidth: .infinity)
-
                     GlassCard {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(place.name)
-                                    .font(LaterrrTypography.display(32))
-                                    .foregroundStyle(LaterrrPalette.textPrimary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(place.name)
+                                .font(LaterrrTypography.display(32))
+                                .foregroundStyle(LaterrrPalette.textPrimary)
 
-                                Text(place.fullAddress)
-                                    .font(LaterrrTypography.body())
-                                    .foregroundStyle(LaterrrPalette.textSecondary)
-                            }
+                            Text(place.fullAddress)
+                                .font(LaterrrTypography.body())
+                                .foregroundStyle(LaterrrPalette.textSecondary)
                         }
 
                         HStack(spacing: 8) {
@@ -46,6 +36,15 @@ struct SavedPlaceDetailView: View {
                                 .foregroundStyle(LaterrrPalette.textSecondary)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    SavedPlacePreviewImage(
+                        place: place,
+                        width: nil,
+                        height: 250,
+                        cornerRadius: 34
+                    )
+                    .frame(maxWidth: .infinity)
 
                     GlassCard {
                         Map(
@@ -56,13 +55,14 @@ struct SavedPlaceDetailView: View {
                                     longitudinalMeters: 700
                                 )
                             ),
-                            interactionModes: [.pan, .zoom]
+                            interactionModes: []
                         ) {
                             Marker(place.name, coordinate: place.coordinate)
                         }
                         .frame(height: 260)
                         .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                     GlassCard {
                         Text("Apple Maps")
@@ -101,6 +101,7 @@ struct SavedPlaceDetailView: View {
                             .buttonStyle(.glass)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(20)
             }

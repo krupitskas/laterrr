@@ -23,36 +23,32 @@ struct SavedPlacesMapView: View {
                 }
                 .scrollIndicators(.hidden)
             } else {
-                Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
-                    ForEach(savedPlaces) { place in
-                        Annotation(place.name, coordinate: place.coordinate, anchor: .bottom) {
-                            Button {
-                                openPlace(place)
-                            } label: {
-                                SavedPlaceMapPin(place: place)
+                VStack(spacing: 0) {
+                    Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
+                        ForEach(savedPlaces) { place in
+                            Annotation(place.name, coordinate: place.coordinate, anchor: .bottom) {
+                                Button {
+                                    openPlace(place)
+                                } label: {
+                                    SavedPlaceMapPin(place: place)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
-                .padding(20)
-                .overlay(alignment: .bottom) {
-                    GlassCard {
-                        Text("Tap a pin to jump into the saved place details.")
-                            .font(LaterrrTypography.caption(.subheadline))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
+                    .onAppear(perform: updateCamera)
+                    .onChange(of: savedPlaces.map(\.id)) { _, _ in
+                        updateCamera()
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
                 }
-                .onAppear(perform: updateCamera)
-                .onChange(of: savedPlaces.map(\.id)) { _, _ in
-                    updateCamera()
-                }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 14)
             }
         }
-        .navigationTitle("Map")
+        .navigationTitle("Places on Map")
     }
 
     private func updateCamera() {

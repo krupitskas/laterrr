@@ -11,6 +11,40 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     GlassCard {
                         VStack(alignment: .leading, spacing: 14) {
+                            Toggle(isOn: .constant(false)) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Save to iCloud")
+                                        .font(LaterrrTypography.headline())
+                                        .foregroundStyle(LaterrrPalette.textPrimary)
+
+                                    Text("Coming soon. laterrr will surface a clearer manual iCloud sync control here.")
+                                        .font(LaterrrTypography.body(.subheadline))
+                                        .foregroundStyle(LaterrrPalette.textSecondary)
+                                }
+                            }
+                            .tint(LaterrrPalette.accent)
+                            .disabled(true)
+                            .opacity(0.58)
+
+                            Toggle(isOn: .constant(false)) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Sync with Bump!")
+                                        .font(LaterrrTypography.headline())
+                                        .foregroundStyle(LaterrrPalette.textPrimary)
+
+                                    Text("Stub for a future export and sync bridge with Bump!.")
+                                        .font(LaterrrTypography.body(.subheadline))
+                                        .foregroundStyle(LaterrrPalette.textSecondary)
+                                }
+                            }
+                            .tint(LaterrrPalette.accent)
+                            .disabled(true)
+                            .opacity(0.58)
+                        }
+                    }
+
+                    GlassCard {
+                        VStack(alignment: .leading, spacing: 14) {
                             Toggle(isOn: $settingsStore.keepPhotoSnapshot) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Keep a photo snapshot with each saved place")
@@ -23,21 +57,6 @@ struct SettingsView: View {
                                 }
                             }
                             .tint(LaterrrPalette.accent)
-
-                            Toggle(isOn: .constant(false)) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Save to iCloud")
-                                        .font(LaterrrTypography.headline())
-                                        .foregroundStyle(LaterrrPalette.textPrimary)
-
-                                    Text("Stub for a future manual sync toggle. The current data container setup still handles storage automatically.")
-                                        .font(LaterrrTypography.body(.subheadline))
-                                        .foregroundStyle(LaterrrPalette.textSecondary)
-                                }
-                            }
-                            .tint(LaterrrPalette.accent)
-                            .disabled(true)
-                            .opacity(0.58)
 
                             Toggle(isOn: $settingsStore.enableLookAroundVerification) {
                                 VStack(alignment: .leading, spacing: 4) {

@@ -84,26 +84,33 @@ final class CaptureViewModel: ObservableObject {
     ) {
         guard let currentReviewState = reviewState else { return }
 
-        let place = SavedPlace(
-            name: suggestion.name,
-            shortAddress: suggestion.shortAddress,
-            fullAddress: suggestion.fullAddress,
-            category: suggestion.category,
-            latitude: suggestion.latitude,
-            longitude: suggestion.longitude,
-            confidence: suggestion.score,
-            matchedText: currentReviewState.analysis.extractedText.joined(separator: ", "),
-            selectionReason: suggestion.rationale,
-            analysisMode: currentReviewState.analysis.analysisMethod,
-            source: .camera,
-            websiteURLString: suggestion.websiteURL?.absoluteString,
-            photoData: settings.keepPhotoSnapshot ? currentReviewState.photo.data : nil
+        let outcome = SavedPlaceStore.save(
+            SavedPlaceDraft(
+                name: suggestion.name,
+                shortAddress: suggestion.shortAddress,
+                fullAddress: suggestion.fullAddress,
+                category: suggestion.category,
+                latitude: suggestion.latitude,
+                longitude: suggestion.longitude,
+                createdAt: .now,
+                confidence: suggestion.score,
+                matchedText: currentReviewState.analysis.extractedText.joined(separator: ", "),
+                selectionReason: suggestion.rationale,
+                analysisMode: currentReviewState.analysis.analysisMethod,
+                source: .camera,
+                websiteURLString: suggestion.websiteURL?.absoluteString,
+                photoData: settings.keepPhotoSnapshot ? currentReviewState.photo.data : nil
+            ),
+            in: modelContext
         )
 
-        modelContext.insert(place)
-        try? modelContext.save()
+        let place = outcome.place
 
-        showBanner("Saved \(suggestion.name) to laterrr.")
+        showBanner(
+            outcome.wasInserted
+                ? "Saved \(place.name) to laterrr."
+                : "\(place.name) was already in laterrr, so I refreshed its details."
+        )
 
         reviewState = nil
     }

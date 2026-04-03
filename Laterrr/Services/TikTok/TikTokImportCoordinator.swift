@@ -58,24 +58,25 @@ final class TikTokImportCoordinator: ObservableObject {
             ? "Imported from TikTok and confirmed in Apple Maps."
             : "Imported from TikTok as \(venue.sourceLine) and confirmed in Apple Maps as \(venue.name)."
 
-        let place = SavedPlace(
-            name: venue.name,
-            shortAddress: venue.shortAddress,
-            fullAddress: venue.fullAddress,
-            category: venue.category,
-            latitude: venue.latitude,
-            longitude: venue.longitude,
-            confidence: 0.92,
-            matchedText: venue.sourceLine,
-            selectionReason: selectionReason,
-            analysisMode: "TikTok import + Apple Maps",
-            source: .tiktok,
-            websiteURLString: venue.websiteURL?.absoluteString,
-            photoData: venue.lookAroundSnapshotData
+        _ = SavedPlaceStore.save(
+            SavedPlaceDraft(
+                name: venue.name,
+                shortAddress: venue.shortAddress,
+                fullAddress: venue.fullAddress,
+                category: venue.category,
+                latitude: venue.latitude,
+                longitude: venue.longitude,
+                createdAt: .now,
+                confidence: 0.92,
+                matchedText: venue.sourceLine,
+                selectionReason: selectionReason,
+                analysisMode: "TikTok import + Apple Maps",
+                source: .tiktok,
+                websiteURLString: venue.websiteURL?.absoluteString,
+                photoData: venue.lookAroundSnapshotData
+            ),
+            in: modelContext
         )
-
-        modelContext.insert(place)
-        try? modelContext.save()
 
         advanceReview()
     }
