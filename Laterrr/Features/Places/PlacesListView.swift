@@ -3,12 +3,15 @@ import SwiftUI
 
 struct PlacesListView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var settingsStore: SettingsStore
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
 
     let openPlace: (SavedPlace) -> Void
 
+    @StateObject private var photoReviewController = PhotoLibraryReviewController()
     @State private var searchText = ""
     @State private var isSearchExpanded = false
+    @State private var isPhotoReviewPickerPresented = false
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -19,6 +22,19 @@ struct PlacesListView: View {
                 content
             }
             .navigationTitle("Places")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isPhotoReviewPickerPresented = true
+                    } label: {
+                        Image(systemName: "photo.stack")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(LaterrrPalette.textPrimary)
+                    }
+                    .disabled(photoReviewController.isPreparing)
+                    .accessibilityLabel("Review recent photos")
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if !savedPlaces.isEmpty {
                     HStack {
@@ -34,6 +50,89 @@ struct PlacesListView: View {
                 if isExpanded {
                     isSearchFocused = true
                 }
+            }
+            .confirmationDialog(
+                "Review your recent photos",
+                isPresented: $isPhotoReviewPickerPresented,
+                titleVisibility: .visible
+            ) {
+                Button("Last 7 days") {
+                    startPhotoReview(dayWindow: 7)
+                }
+
+                Button("Last 14 days") {
+                    startPhotoReview(dayWindow: 14)
+                }
+
+                Button("Last 30 days") {
+                    startPhotoReview(dayWindow: 30)
+                }
+
+                Button("Last 90 days") {
+                    startPhotoReview(dayWindow: 90)
+                }
+
+                Button("Last 180 days") {
+                    startPhotoReview(dayWindow: 180)
+                }
+
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("laterrr will scan recent photos with location data, look for place text, and build a review deck before anything is saved.")
+            }
+            .fullScreenCover(
+                isPresented: Binding(
+                    get: { photoReviewController.isPresentingReview },
+                    set: { if !$0 { photoReviewController.dismissReview() } }
+                )
+            ) {
+                PhotoLibraryReviewView(
+                    controller: photoReviewController,
+                    skipAction: {
+                        photoReviewController.skipCurrent()
+                    },
+                    saveAction: {
+                        photoReviewController.saveCurrent(modelContext: modelContext)
+                    }
+                )
+            }
+            .overlay {
+                if photoReviewController.isPreparing && !photoReviewController.isPresentingReview {
+                    Color.black.opacity(0.10)
+                        .ignoresSafeArea()
+                        .overlay {
+                            GlassCard(alignment: .center) {
+                                LaterrrBrandStar(size: 110, isSpinning: true)
+
+                                Text("Reviewing recent place photos")
+                                    .font(LaterrrTypography.display(28))
+                                    .foregroundStyle(LaterrrPalette.textPrimary)
+
+                                ProgressView(value: photoReviewController.progressFraction)
+                                    .tint(LaterrrPalette.accent)
+
+                                Text(photoReviewController.progressSummary)
+                                    .font(LaterrrTypography.body())
+                                    .foregroundStyle(LaterrrPalette.textSecondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: 340)
+                            .padding(24)
+                        }
+                }
+            }
+            .alert(
+                "Photos Review",
+                isPresented: Binding(
+                    get: { photoReviewController.alertMessage != nil },
+                    set: { if !$0 { photoReviewController.dismissAlert() } }
+                )
+            ) {
+                Button("OK", role: .cancel) {
+                    photoReviewController.dismissAlert()
+                }
+            } message: {
+                Text(photoReviewController.alertMessage ?? "")
             }
         }
     }
@@ -176,6 +275,13 @@ struct PlacesListView: View {
     private func delete(_ place: SavedPlace) {
         modelContext.delete(place)
         try? modelContext.save()
+    }
+
+    private func startPhotoReview(dayWindow: Int) {
+        photoReviewController.startReview(
+            dayWindow: dayWindow,
+            enableLookAroundVerification: settingsStore.enableLookAroundVerification
+        )
     }
 }
 

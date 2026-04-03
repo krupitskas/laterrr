@@ -12,6 +12,7 @@
 		12266529E9B2171917E8FB74 /* LookAroundSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */; };
 		143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044AF9D78396F07C8781FB00 /* PlaceSuggestion.swift */; };
 		182F6133EF666CEE8C5F00C1 /* LaterrrShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EF878594DFC998A577D4CC8D /* LaterrrShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		18C82FAECDD30E1064921E70 /* mobileclip_s0_image.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F3CDE710D6BF71A2A0D9B78F /* mobileclip_s0_image.mlpackage */; };
 		236DC46B9B0B0F9AD17D51D5 /* CaptureViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E57A4359E8BA728E6CA2E494 /* CaptureViewModel.swift */; };
 		2658C52F836F2CA7E41DEE05 /* TikTokDescriptionExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6C2F9AA08F041886778CA0 /* TikTokDescriptionExtractor.swift */; };
 		31722A50A57393AD4626E2B0 /* CameraSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */; };
@@ -20,23 +21,32 @@
 		54EBC0CF7F68F60A6665C577 /* TikTokImportURLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDAE8E30DD655258755853B9 /* TikTokImportURLParser.swift */; };
 		601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492E22026316A922FDE69278 /* LaterrrVisuals.swift */; };
 		665587B28B1A71D19C364B8D /* TikTokAppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF50BD3100BB53CB9A233F5 /* TikTokAppGroup.swift */; };
+		6A200C8347DA128200CC00C2 /* mobileclip_s0_text.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 1862910BD6B7E76B3743D67E /* mobileclip_s0_text.mlpackage */; };
+		6B23997F47BFDAC8CCD438A3 /* clip-vocab.json in Resources */ = {isa = PBXBuildFile; fileRef = DBFED253B31B2D16F2C448B6 /* clip-vocab.json */; };
 		734C8E1EB805A2B2147E4D93 /* TikTokAppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF50BD3100BB53CB9A233F5 /* TikTokAppGroup.swift */; };
 		74E74CC34199D25E59BFD4B8 /* MapsExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3126750A6288313C256DBDB5 /* MapsExporter.swift */; };
+		75361D496C52D3913A51FC1D /* PhotoLibraryReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C27368F439AF92C309AE64C /* PhotoLibraryReviewController.swift */; };
 		7C97B6E94669E22C4D9CBD46 /* VenueTextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */; };
 		839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E64CD3654264C9E1323B351 /* SavedPlace.swift */; };
 		86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */; };
 		8A8DC8D62587858A960A8EC0 /* TikTokVenueResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09E05C189FDA7D5C82434CB /* TikTokVenueResolver.swift */; };
 		8E088955F7B90571158AFB08 /* TikTokDescriptionExtractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F560927C245D4FD8B4AAC83 /* TikTokDescriptionExtractorTests.swift */; };
+		92DF596AABCA1E8881FC06BB /* clip-merges.txt in Resources */ = {isa = PBXBuildFile; fileRef = E0503EDB59EC3AB8153ECA7D /* clip-merges.txt */; };
 		93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745887AE56C482E44422E82E /* CaptureView.swift */; };
 		96AFCFAB74CB183F6EE879CF /* LookAroundVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */; };
 		9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251D4DCD245919DF391337EC /* LaterrrApp.swift */; };
 		9ED48515FCA571A2FDECD6AF /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6CF5903E018CB0E839C583 /* SettingsStore.swift */; };
+		A342F2D02654BFF17E3BFA7D /* PhotoLibraryReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1382E5E501BB8A52FA05819C /* PhotoLibraryReviewView.swift */; };
 		B4D0E099CAD4F4D6FCD662D5 /* TikTokImportReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3E280B705610F439F88F05 /* TikTokImportReviewView.swift */; };
+		B7E17F0A9AEA48468FC22149 /* CLIPTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF56C3FC50665CE6AF599245 /* CLIPTokenizer.swift */; };
 		B82DFDCF9291E5BA81AC5D5D /* TikTokImportCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8166676923CC765AEAC45037 /* TikTokImportCoordinator.swift */; };
 		BA523D041E2D0B4B0C6E7E4D /* SavedPlaceSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEA9CC20AA4DD40733989536 /* SavedPlaceSource.swift */; };
 		BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E54173E655D3C7D69B2BDC67 /* RootView.swift */; };
 		D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */; };
+		DB05AD38679BA7204C94DF87 /* MobileCLIPVenueScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916940500168220B2D87AEE0 /* MobileCLIPVenueScorer.swift */; };
+		DD56AEA2A7975EEEB6F6CF03 /* FoodVenueExteriorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */; };
 		E2FF6B5411ADC6318F47E170 /* TikTokPlaceParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755CAF0187C961B09C8CC695 /* TikTokPlaceParser.swift */; };
+		E951D768906916561AAC03D2 /* GPT2ByteEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A2D05381379E8C8A6453C4 /* GPT2ByteEncoder.swift */; };
 		F0B809C3B85F56789BA63C6E /* SavedPlacesMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F5056D29EB3D0045E156D8 /* SavedPlacesMapView.swift */; };
 		F412F74415BD09FAFFF30ECC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3B8AA1B47A9B4A175E3F3 /* SettingsView.swift */; };
 		F4786D104A30680A8257A018 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8212693F75F64B0C10AA073 /* ShareViewController.swift */; };
@@ -80,7 +90,10 @@
 		044AF9D78396F07C8781FB00 /* PlaceSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSuggestion.swift; sourceTree = "<group>"; };
 		05F5056D29EB3D0045E156D8 /* SavedPlacesMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlacesMapView.swift; sourceTree = "<group>"; };
 		0E64CD3654264C9E1323B351 /* SavedPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlace.swift; sourceTree = "<group>"; };
+		1382E5E501BB8A52FA05819C /* PhotoLibraryReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryReviewView.swift; sourceTree = "<group>"; };
 		15885B571A5D9BC588C81031 /* TikTokImportRoutine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokImportRoutine.swift; sourceTree = "<group>"; };
+		1862910BD6B7E76B3743D67E /* mobileclip_s0_text.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = mobileclip_s0_text.mlpackage; sourceTree = "<group>"; };
+		1C27368F439AF92C309AE64C /* PhotoLibraryReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryReviewController.swift; sourceTree = "<group>"; };
 		21126B979BC6B0FA26C6FFBE /* Laterrr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Laterrr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		251D4DCD245919DF391337EC /* LaterrrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaterrrApp.swift; sourceTree = "<group>"; };
 		2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookAroundSnapshotService.swift; sourceTree = "<group>"; };
@@ -103,17 +116,24 @@
 		87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueTextRecognizer.swift; sourceTree = "<group>"; };
 		8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesListView.swift; sourceTree = "<group>"; };
 		8F3E280B705610F439F88F05 /* TikTokImportReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokImportReviewView.swift; sourceTree = "<group>"; };
+		916940500168220B2D87AEE0 /* MobileCLIPVenueScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCLIPVenueScorer.swift; sourceTree = "<group>"; };
 		9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionModel.swift; sourceTree = "<group>"; };
 		A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceCapturePipeline.swift; sourceTree = "<group>"; };
+		A8A2D05381379E8C8A6453C4 /* GPT2ByteEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT2ByteEncoder.swift; sourceTree = "<group>"; };
 		BDAE8E30DD655258755853B9 /* TikTokImportURLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokImportURLParser.swift; sourceTree = "<group>"; };
+		D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodVenueExteriorClassifier.swift; sourceTree = "<group>"; };
 		D8212693F75F64B0C10AA073 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		DBFED253B31B2D16F2C448B6 /* clip-vocab.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clip-vocab.json"; sourceTree = "<group>"; };
 		DE6CF5903E018CB0E839C583 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		DF56C3FC50665CE6AF599245 /* CLIPTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPTokenizer.swift; sourceTree = "<group>"; };
+		E0503EDB59EC3AB8153ECA7D /* clip-merges.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "clip-merges.txt"; sourceTree = "<group>"; };
 		E13C1ADE6131666B8A48A012 /* SavedPlacePreviewImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlacePreviewImage.swift; sourceTree = "<group>"; };
 		E3BF0955D8FA4D706137B112 /* LaterrrTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LaterrrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E54173E655D3C7D69B2BDC67 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E57A4359E8BA728E6CA2E494 /* CaptureViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureViewModel.swift; sourceTree = "<group>"; };
 		EF878594DFC998A577D4CC8D /* LaterrrShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LaterrrShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		F09E05C189FDA7D5C82434CB /* TikTokVenueResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokVenueResolver.swift; sourceTree = "<group>"; };
+		F3CDE710D6BF71A2A0D9B78F /* mobileclip_s0_image.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = mobileclip_s0_image.mlpackage; sourceTree = "<group>"; };
 		FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStore.swift; sourceTree = "<group>"; };
 		FD6C2F9AA08F041886778CA0 /* TikTokDescriptionExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokDescriptionExtractor.swift; sourceTree = "<group>"; };
 		FEA9CC20AA4DD40733989536 /* SavedPlaceSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPlaceSource.swift; sourceTree = "<group>"; };
@@ -129,6 +149,23 @@
 				9B2D42B87076D81D11908F08 /* TikTok */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		2AB97CDFA613FA01230C1C86 /* Tokenizer */ = {
+			isa = PBXGroup;
+			children = (
+				E0503EDB59EC3AB8153ECA7D /* clip-merges.txt */,
+				DBFED253B31B2D16F2C448B6 /* clip-vocab.json */,
+			);
+			path = Tokenizer;
+			sourceTree = "<group>";
+		};
+		33CF948A45BD86EFEED48F49 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A85EEB539F2386CAF26BCE83 /* MobileCLIP */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		3FB7069F39AB585488E2CFEE = {
@@ -169,6 +206,16 @@
 			path = LaterrrShareExtension;
 			sourceTree = "<group>";
 		};
+		60F0FCC294FE6AD2427910B3 /* MobileCLIP */ = {
+			isa = PBXGroup;
+			children = (
+				DF56C3FC50665CE6AF599245 /* CLIPTokenizer.swift */,
+				A8A2D05381379E8C8A6453C4 /* GPT2ByteEncoder.swift */,
+				916940500168220B2D87AEE0 /* MobileCLIPVenueScorer.swift */,
+			);
+			path = MobileCLIP;
+			sourceTree = "<group>";
+		};
 		622D23F8A1AEA8C5E6D8358C /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +228,8 @@
 		69F7E87138DCEB2378B476D8 /* Places */ = {
 			isa = PBXGroup;
 			children = (
+				1C27368F439AF92C309AE64C /* PhotoLibraryReviewController.swift */,
+				1382E5E501BB8A52FA05819C /* PhotoLibraryReviewView.swift */,
 				8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */,
 				6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */,
 				E13C1ADE6131666B8A48A012 /* SavedPlacePreviewImage.swift */,
@@ -195,6 +244,16 @@
 				8F3E280B705610F439F88F05 /* TikTokImportReviewView.swift */,
 			);
 			path = TikTok;
+			sourceTree = "<group>";
+		};
+		A85EEB539F2386CAF26BCE83 /* MobileCLIP */ = {
+			isa = PBXGroup;
+			children = (
+				F3CDE710D6BF71A2A0D9B78F /* mobileclip_s0_image.mlpackage */,
+				1862910BD6B7E76B3743D67E /* mobileclip_s0_text.mlpackage */,
+				2AB97CDFA613FA01230C1C86 /* Tokenizer */,
+			);
+			path = MobileCLIP;
 			sourceTree = "<group>";
 		};
 		B3825EE0271C3F42D32AEA3C /* LaterrrTests */ = {
@@ -251,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */,
+				D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */,
 				FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */,
 				2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */,
 				7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */,
@@ -260,6 +320,7 @@
 				DE6CF5903E018CB0E839C583 /* SettingsStore.swift */,
 				3425E4962518D33AA4A33FBA /* VenueMatcher.swift */,
 				87423A59F702089673CCE2A9 /* VenueTextRecognizer.swift */,
+				60F0FCC294FE6AD2427910B3 /* MobileCLIP */,
 				C4FE53F4D4F8F463CFAA0D8D /* TikTok */,
 			);
 			path = Services;
@@ -272,6 +333,7 @@
 				622D23F8A1AEA8C5E6D8358C /* App */,
 				270AA5054290C9CC3A08A0AE /* Features */,
 				55950886F6D9CCFD33F8D6DD /* Models */,
+				33CF948A45BD86EFEED48F49 /* Resources */,
 				EF53190DF8649A12BD309C02 /* Services */,
 				CE99F087C9E7A7766EE9DCAD /* Shared */,
 			);
@@ -321,6 +383,7 @@
 			buildConfigurationList = 83F58245680507D15FDEC0C1 /* Build configuration list for PBXNativeTarget "Laterrr" */;
 			buildPhases = (
 				8597D24451D2EFCFFA4CD568 /* Sources */,
+				5BD735710299D29FC31E78B1 /* Resources */,
 				8E81E1EF7CB2EE7CA41C066A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -365,6 +428,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		5BD735710299D29FC31E78B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92DF596AABCA1E8881FC06BB /* clip-merges.txt in Resources */,
+				6B23997F47BFDAC8CCD438A3 /* clip-vocab.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		4E2B98BB5FE5C8B3DAAAA1AC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -379,16 +454,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B7E17F0A9AEA48468FC22149 /* CLIPTokenizer.swift in Sources */,
 				31722A50A57393AD4626E2B0 /* CameraSessionModel.swift in Sources */,
 				93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */,
 				236DC46B9B0B0F9AD17D51D5 /* CaptureViewModel.swift in Sources */,
+				DD56AEA2A7975EEEB6F6CF03 /* FoodVenueExteriorClassifier.swift in Sources */,
+				E951D768906916561AAC03D2 /* GPT2ByteEncoder.swift in Sources */,
 				9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */,
 				601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */,
 				FB04DF3047B4542B3600B0F6 /* LocationStore.swift in Sources */,
 				12266529E9B2171917E8FB74 /* LookAroundSnapshotService.swift in Sources */,
 				96AFCFAB74CB183F6EE879CF /* LookAroundVerifier.swift in Sources */,
 				74E74CC34199D25E59BFD4B8 /* MapsExporter.swift in Sources */,
+				DB05AD38679BA7204C94DF87 /* MobileCLIPVenueScorer.swift in Sources */,
 				D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */,
+				75361D496C52D3913A51FC1D /* PhotoLibraryReviewController.swift in Sources */,
+				A342F2D02654BFF17E3BFA7D /* PhotoLibraryReviewView.swift in Sources */,
 				0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */,
 				143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */,
 				86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */,
@@ -410,6 +491,8 @@
 				8A8DC8D62587858A960A8EC0 /* TikTokVenueResolver.swift in Sources */,
 				F9C90089F45850A8F1D67D5E /* VenueMatcher.swift in Sources */,
 				7C97B6E94669E22C4D9CBD46 /* VenueTextRecognizer.swift in Sources */,
+				18C82FAECDD30E1064921E70 /* mobileclip_s0_image.mlpackage in Sources */,
+				6A200C8347DA128200CC00C2 /* mobileclip_s0_text.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

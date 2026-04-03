@@ -3,3 +3,4 @@
 xcuserdata/
 *.xcuserstate
 .clang-module-cache
+.swift-module-cache

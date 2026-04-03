@@ -5,12 +5,18 @@ enum PlaceCapturePipeline {
     static func analyze(
         photoData: Data,
         location: CLLocation?,
-        enableLookAroundVerification: Bool
+        enableLookAroundVerification: Bool,
+        extractedText precomputedText: [String]? = nil
     ) async -> CaptureAnalysisPayload {
         let searcher = NearbyVenueSearcher()
         let matcher = VenueMatcher()
 
-        let extractedText = await VenueTextRecognizer.recognizeText(in: photoData)
+        let extractedText: [String]
+        if let precomputedText {
+            extractedText = precomputedText
+        } else {
+            extractedText = await VenueTextRecognizer.recognizeText(in: photoData)
+        }
         let candidates = await searcher.searchCandidates(near: location, extractedText: extractedText)
 
         let initialRanking = matcher.rank(
