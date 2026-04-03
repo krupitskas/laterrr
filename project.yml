@@ -16,6 +16,22 @@ settings:
     ENABLE_PREVIEWS: YES
     SWIFT_EMIT_LOC_STRINGS: YES
 
+schemes:
+  Laterrr:
+    build:
+      targets:
+        Laterrr: all
+        LaterrrTests: [test]
+    run:
+      executable: Laterrr
+    test:
+      targets:
+        - LaterrrTests
+    management:
+      shared: true
+      orderHint: 0
+      isShown: true
+
 targets:
   Laterrr:
     type: application
@@ -35,12 +51,12 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.Laterrr
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Laterrr
+        INFOPLIST_KEY_CFBundleDisplayName: laterrr
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
-        INFOPLIST_KEY_NSCameraUsageDescription: Laterrr opens straight into camera mode so you can identify nearby cafes and restaurants from a photo.
-        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: Laterrr uses your location to compare the photo against nearby venues in Apple Maps.
-        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Laterrr can import a venue photo from your library when you do not want to shoot live.
-        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: Laterrr can keep a photo snapshot with each saved place when you want visual memory.
+        INFOPLIST_KEY_NSCameraUsageDescription: laterrr opens straight into camera mode so you can identify nearby cafes and restaurants from a photo.
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: laterrr uses your location to compare the photo against nearby venues in Apple Maps.
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: laterrr can import a venue photo from your library when you do not want to shoot live.
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: laterrr can keep a photo snapshot with each saved place when you want visual memory.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
           - UIInterfaceOrientationPortrait
@@ -80,3 +96,7 @@ targets:
       - path: LaterrrTests
     dependencies:
       - target: Laterrr
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.LaterrrTests

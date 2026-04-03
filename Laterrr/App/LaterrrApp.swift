@@ -4,12 +4,19 @@ import SwiftUI
 @main
 struct LaterrrApp: App {
     @StateObject private var settingsStore = SettingsStore()
+    @StateObject private var tikTokImportCoordinator = TikTokImportCoordinator()
     private let modelContainer = LaterrrModelContainer.shared
+
+    init() {
+        LaterrrChrome.configureNavigationAppearance()
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
+                .font(LaterrrTypography.body())
                 .environmentObject(settingsStore)
+                .environmentObject(tikTokImportCoordinator)
         }
         .modelContainer(modelContainer)
     }

@@ -10,7 +10,7 @@ final class ShareViewController: SLComposeServiceViewController {
 
         navigationItem.rightBarButtonItem?.title = "Import"
         navigationItem.rightBarButtonItem?.isEnabled = false
-        placeholder = "Send a TikTok link to Laterrr for review."
+        placeholder = "Send a TikTok link to laterrr for review."
 
         Task {
             await loadSharedURL()
@@ -113,6 +113,6 @@ private enum ShareExtensionError: LocalizedError {
     case missingURL
 
     var errorDescription: String? {
-        "Laterrr could not find a TikTok link in this share."
+        "laterrr could not find a TikTok link in this share."
     }
 }

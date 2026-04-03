@@ -19,7 +19,7 @@ enum CameraCaptureError: LocalizedError {
         case .denied:
             return "Camera access is off. Enable it in Settings to capture storefronts live."
         case .invalidData:
-            return "Laterrr could not decode the captured photo."
+            return "laterrr could not decode the captured photo."
         case .alreadyCapturing:
             return "A capture is already in progress."
         }
@@ -137,7 +137,7 @@ final class CameraSessionModel: NSObject, ObservableObject {
                 }
             } catch {
                 Task { @MainActor in
-                    self.lastError = "Laterrr could not change the camera zoom right now."
+                    self.lastError = "laterrr could not change the camera zoom right now."
                 }
             }
         }
@@ -194,7 +194,7 @@ final class CameraSessionModel: NSObject, ObservableObject {
                 camera.unlockForConfiguration()
             } catch {
                 Task { @MainActor in
-                    self.lastError = "Laterrr could not set the default camera zoom."
+                    self.lastError = "laterrr could not set the default camera zoom."
                 }
             }
 

@@ -18,6 +18,11 @@ struct TikTokImportReviewState: Identifiable {
 
 @MainActor
 final class TikTokImportCoordinator: ObservableObject {
+    enum EnqueueOutcome {
+        case started
+        case queued
+    }
+
     @Published var reviewState: TikTokImportReviewState?
     @Published var isImporting = false
     @Published var alertMessage: String?
@@ -31,6 +36,18 @@ final class TikTokImportCoordinator: ObservableObject {
 
         activeTask = Task {
             await importPending(pendingImport)
+        }
+    }
+
+    func enqueueImport(from rawURLString: String) -> Result<EnqueueOutcome, TikTokImportURLParser.ParseError> {
+        switch TikTokImportURLParser.parse(rawURLString) {
+        case let .success(url):
+            let willStartNow = reviewState == nil && activeTask == nil
+            TikTokPendingImportStore.enqueue(url: url)
+            processPendingImportsIfNeeded()
+            return .success(willStartNow ? .started : .queued)
+        case let .failure(error):
+            return .failure(error)
         }
     }
 
@@ -54,7 +71,7 @@ final class TikTokImportCoordinator: ObservableObject {
             analysisMode: "TikTok import + Apple Maps",
             source: .tiktok,
             websiteURLString: venue.websiteURL?.absoluteString,
-            photoData: nil
+            photoData: venue.lookAroundSnapshotData
         )
 
         modelContext.insert(place)
@@ -73,23 +90,25 @@ final class TikTokImportCoordinator: ObservableObject {
 
     private func importPending(_ pendingImport: PendingTikTokImport) async {
         isImporting = true
-        defer {
-            isImporting = false
-            activeTask = nil
-        }
 
         guard let sourceURL = pendingImport.sourceURL else {
             TikTokPendingImportStore.remove(importID: pendingImport.id)
-            alertMessage = "Laterrr could not read that shared TikTok link."
+            isImporting = false
+            activeTask = nil
+            alertMessage = "laterrr could not read that shared TikTok link."
             return
         }
 
         do {
             let reviewDeck = try await TikTokImportRoutine.buildReviewDeck(from: sourceURL)
             TikTokPendingImportStore.remove(importID: pendingImport.id)
+            isImporting = false
+            activeTask = nil
             reviewState = TikTokImportReviewState(deck: reviewDeck)
         } catch {
             TikTokPendingImportStore.remove(importID: pendingImport.id)
+            isImporting = false
+            activeTask = nil
             alertMessage = error.localizedDescription
         }
     }

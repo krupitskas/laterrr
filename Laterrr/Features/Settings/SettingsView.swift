@@ -14,11 +14,11 @@ struct SettingsView: View {
                             Toggle(isOn: $settingsStore.keepPhotoSnapshot) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Keep a photo snapshot with each saved place")
-                                        .font(.system(.headline, design: .rounded))
+                                        .font(LaterrrTypography.headline())
                                         .foregroundStyle(LaterrrPalette.textPrimary)
 
                                     Text("Helpful when you want the storefront image to stay attached to your list in iCloud.")
-                                        .font(.system(.subheadline, design: .rounded))
+                                        .font(LaterrrTypography.body(.subheadline))
                                         .foregroundStyle(LaterrrPalette.textSecondary)
                                 }
                             }
@@ -27,11 +27,11 @@ struct SettingsView: View {
                             Toggle(isOn: .constant(false)) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Save to iCloud")
-                                        .font(.system(.headline, design: .rounded))
+                                        .font(LaterrrTypography.headline())
                                         .foregroundStyle(LaterrrPalette.textPrimary)
 
                                     Text("Stub for a future manual sync toggle. The current data container setup still handles storage automatically.")
-                                        .font(.system(.subheadline, design: .rounded))
+                                        .font(LaterrrTypography.body(.subheadline))
                                         .foregroundStyle(LaterrrPalette.textSecondary)
                                 }
                             }
@@ -42,11 +42,11 @@ struct SettingsView: View {
                             Toggle(isOn: $settingsStore.enableLookAroundVerification) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Improve matches with Look Around")
-                                        .font(.system(.headline, design: .rounded))
+                                        .font(LaterrrTypography.headline())
                                         .foregroundStyle(LaterrrPalette.textPrimary)
 
-                                    Text("When Apple street-level imagery exists, Laterrr compares it to your photo and shows the visual preview in the ranking.")
-                                        .font(.system(.subheadline, design: .rounded))
+                                    Text("When Apple street-level imagery exists, laterrr compares it to your photo and shows the visual preview in the ranking.")
+                                        .font(LaterrrTypography.body(.subheadline))
                                         .foregroundStyle(LaterrrPalette.textSecondary)
                                 }
                             }
@@ -60,5 +60,6 @@ struct SettingsView: View {
             .scrollIndicators(.hidden)
         }
         .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

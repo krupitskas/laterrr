@@ -5,8 +5,8 @@ struct RootView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var settingsStore: SettingsStore
+    @EnvironmentObject private var tikTokImportCoordinator: TikTokImportCoordinator
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
-    @StateObject private var tikTokImportCoordinator = TikTokImportCoordinator()
     @State private var selectedTab: RootTab = .capture
     @State private var placesPath: [UUID] = []
 
@@ -21,7 +21,7 @@ struct RootView: View {
             .tag(RootTab.map)
 
             NavigationStack(path: $placesPath) {
-                PlacesListView()
+                PlacesListView(openPlace: openPlaceFromPlaces)
                     .navigationDestination(for: UUID.self) { placeID in
                         placeDestination(for: placeID)
                     }
@@ -78,11 +78,11 @@ struct RootView: View {
                                 .tint(LaterrrPalette.accent)
 
                             Text("Importing TikTok roundup")
-                                .font(.system(.headline, design: .rounded))
+                                .font(LaterrrTypography.headline())
                                 .foregroundStyle(LaterrrPalette.textPrimary)
 
-                            Text("Laterrr is loading the shared TikTok link, parsing the caption on-device, and matching places in Apple Maps.")
-                                .font(.system(.body, design: .rounded))
+                            Text("laterrr is loading the TikTok link, parsing the caption on-device, and matching places in Apple Maps.")
+                                .font(LaterrrTypography.body())
                                 .foregroundStyle(LaterrrPalette.textSecondary)
                                 .multilineTextAlignment(.center)
                         }
@@ -107,8 +107,19 @@ struct RootView: View {
     }
 
     private func openPlaceFromMap(_ place: SavedPlace) {
+        showPlace(place, switchToPlacesTab: true)
+    }
+
+    private func openPlaceFromPlaces(_ place: SavedPlace) {
+        showPlace(place, switchToPlacesTab: false)
+    }
+
+    private func showPlace(_ place: SavedPlace, switchToPlacesTab: Bool) {
         placesPath = [place.id]
-        selectedTab = .places
+
+        if switchToPlacesTab {
+            selectedTab = .places
+        }
     }
 
     @ViewBuilder

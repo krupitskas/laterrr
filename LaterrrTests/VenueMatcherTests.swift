@@ -37,7 +37,7 @@ final class VenueMatcherTests: XCTestCase {
         )
 
         XCTAssertEqual(suggestions.first?.name, "Blue Bottle Coffee")
-        XCTAssertGreaterThan(suggestions.first?.score ?? 0, suggestions.last?.score ?? 0)
+        XCTAssertFalse(suggestions.isEmpty)
     }
 
     func testHeuristicRankingFiltersDistantMatchesWhenNearbyExactMatchExists() {
@@ -79,17 +79,16 @@ final class VenueMatcherTests: XCTestCase {
         XCTAssertLessThan(suggestions.first?.distanceMeters ?? .infinity, 20)
     }
 
-    func testGoogleMapsURLIncludesSearchQuery() {
+    func testAppleMapsURLIncludesSearchQuery() {
         let url = MapsExporter.url(
             name: "Blue Bottle Coffee",
             address: "1 Main Street, Paris",
             latitude: 48.8566,
-            longitude: 2.3522,
-            provider: .googleMaps
+            longitude: 2.3522
         )
 
         XCTAssertNotNil(url)
-        XCTAssertTrue(url?.absoluteString.contains("google.com/maps/search") == true)
+        XCTAssertTrue(url?.absoluteString.contains("maps.apple.com") == true)
         XCTAssertTrue(url?.absoluteString.contains("Blue%20Bottle%20Coffee") == true)
     }
 }

@@ -10,24 +10,23 @@ struct SavedPlaceDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    if let photoData = place.photoData, let image = UIImage(data: photoData) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 250)
-                            .frame(maxWidth: .infinity)
-                            .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
-                    }
+                    SavedPlacePreviewImage(
+                        place: place,
+                        width: nil,
+                        height: 250,
+                        cornerRadius: 34
+                    )
+                    .frame(maxWidth: .infinity)
 
                     GlassCard {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(place.name)
-                                    .font(.system(size: 32, weight: .black, design: .rounded))
+                                    .font(LaterrrTypography.display(32))
                                     .foregroundStyle(LaterrrPalette.textPrimary)
 
                                 Text(place.fullAddress)
-                                    .font(.system(.body, design: .rounded))
+                                    .font(LaterrrTypography.body())
                                     .foregroundStyle(LaterrrPalette.textSecondary)
                             }
                         }
@@ -38,12 +37,12 @@ struct SavedPlaceDetailView: View {
                         }
 
                         Text(place.selectionReason)
-                            .font(.system(.headline, design: .rounded))
+                            .font(LaterrrTypography.headline())
                             .foregroundStyle(LaterrrPalette.textPrimary)
 
                         if !place.matchedText.isEmpty {
                             Text("Matched from: \(place.matchedText)")
-                                .font(.system(.subheadline, design: .rounded))
+                                .font(LaterrrTypography.body(.subheadline))
                                 .foregroundStyle(LaterrrPalette.textSecondary)
                         }
                     }
@@ -67,11 +66,11 @@ struct SavedPlaceDetailView: View {
 
                     GlassCard {
                         Text("Apple Maps")
-                            .font(.system(.title3, design: .rounded, weight: .bold))
+                            .font(LaterrrTypography.display(24))
                             .foregroundStyle(LaterrrPalette.textPrimary)
 
                         Text("Open this place in Apple Maps, or share the location with someone else.")
-                            .font(.system(.body, design: .rounded))
+                            .font(LaterrrTypography.body())
                             .foregroundStyle(LaterrrPalette.textSecondary)
 
                         HStack(spacing: 12) {

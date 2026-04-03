@@ -53,16 +53,16 @@ final class VenueMatcher {
     }
 
     static func matchingSummary() -> String {
-        "Laterrr uses on-device text recognition and nearby map search. Exact sign matches are prioritized, and far-away results are filtered out before suggestions appear."
+        "laterrr uses on-device text recognition and nearby map search. Exact sign matches are prioritized, and far-away results are filtered out before suggestions appear."
     }
 
     private func heuristicNarrative(for suggestions: [PlaceSuggestion], extractedText: [String]) -> String {
         guard let topSuggestion = suggestions.first else {
             if extractedText.isEmpty {
-                return "No readable storefront text yet, so Laterrr needs a clearer photo or location context."
+                return "No readable storefront text yet, so laterrr needs a clearer photo or location context."
             }
 
-            return "Laterrr read sign text but could not find a believable nearby match. Try a clearer storefront shot or move closer to the entrance."
+            return "laterrr read sign text but could not find a believable nearby match. Try a clearer storefront shot or move closer to the entrance."
         }
 
         if topSuggestion.matchedTokens.isEmpty {

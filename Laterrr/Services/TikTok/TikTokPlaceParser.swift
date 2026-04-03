@@ -18,21 +18,7 @@ enum TikTokPlaceParser {
 
         let title = lines.first(where: isTitleLine) ?? lines.first ?? "TikTok roundup"
         let locationHint = extractLocationHint(from: normalizedCaption, lines: lines)
-
-        var venueNames: [String] = []
-
-        for line in lines {
-            if let candidate = candidateVenueName(from: line, locationHint: locationHint) {
-                appendUnique(candidate, into: &venueNames)
-            }
-        }
-
-        for entity in namedEntities(from: normalizedCaption) {
-            guard let candidate = candidateVenueName(from: entity, locationHint: locationHint) else {
-                continue
-            }
-            appendUnique(candidate, into: &venueNames)
-        }
+        let venueNames = pinnedVenueNames(from: normalizedCaption, locationHint: locationHint)
 
         return TikTokParsedRoundup(
             title: title,
@@ -51,6 +37,7 @@ enum TikTokPlaceParser {
 
     private static func candidateVenueName(from rawLine: String, locationHint: String?) -> String? {
         var line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        line = line.replacingOccurrences(of: "📍", with: "")
         line = line.replacingOccurrences(of: #"^[\d\.\-\)\s]+"#, with: "", options: .regularExpression)
         line = line.replacingOccurrences(of: #"^[•●▪︎]+\s*"#, with: "", options: .regularExpression)
         line = line.trimmingCharacters(in: CharacterSet(charactersIn: "\"'“”`"))
@@ -81,6 +68,25 @@ enum TikTokPlaceParser {
 
         guard !bannedExactMatches.contains(normalizedLine) else { return nil }
         return line
+    }
+
+    private static func pinnedVenueNames(from text: String, locationHint: String?) -> [String] {
+        var venueNames: [String] = []
+
+        for segment in text.components(separatedBy: "📍").dropFirst() {
+            let firstLine = segment
+                .components(separatedBy: .newlines)
+                .first?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            guard let candidate = candidateVenueName(from: firstLine, locationHint: locationHint) else {
+                continue
+            }
+
+            appendUnique(candidate, into: &venueNames)
+        }
+
+        return venueNames
     }
 
     private static func isTitleLine(_ line: String) -> Bool {

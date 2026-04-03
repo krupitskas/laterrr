@@ -16,7 +16,7 @@ struct SavedPlacesMapView: View {
                 ScrollView {
                     EmptyStateView(
                         title: "Your saved map is still empty",
-                        message: "Capture a cafe or restaurant and Laterrr drops a pin here for quick revisits.",
+                        message: "Capture a cafe or restaurant and laterrr drops a pin here for quick revisits.",
                         systemImage: "cup.and.saucer.fill"
                     )
                     .padding(20)
@@ -40,7 +40,7 @@ struct SavedPlacesMapView: View {
                 .overlay(alignment: .bottom) {
                     GlassCard {
                         Text("Tap a pin to jump into the saved place details.")
-                            .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                            .font(LaterrrTypography.caption(.subheadline))
                             .foregroundStyle(LaterrrPalette.textPrimary)
                     }
                     .padding(.horizontal, 20)
@@ -109,7 +109,7 @@ private struct SavedPlaceMapPin: View {
     var body: some View {
         VStack(spacing: 6) {
             Text(place.name)
-                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .font(LaterrrTypography.caption(.caption2))
                 .foregroundStyle(LaterrrPalette.textPrimary)
                 .lineLimit(1)
                 .padding(.horizontal, 10)

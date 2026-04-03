@@ -18,9 +18,9 @@ enum TikTokImportRoutine {
         var errorDescription: String? {
             switch self {
             case .noVenueNames:
-                return "Laterrr opened the TikTok description, but it could not find a list of places to import."
+                return "laterrr read the TikTok description, but no places were found. For now, add one place after each 📍 marker."
             case .noResolvedVenues:
-                return "Laterrr read the TikTok description, but Apple Maps could not confirm any venues from it."
+                return "laterrr read the TikTok description, but Apple Maps could not confirm any venues from it."
             }
         }
     }

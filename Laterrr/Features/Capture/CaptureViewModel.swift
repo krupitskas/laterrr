@@ -21,6 +21,7 @@ final class CaptureViewModel: ObservableObject {
     let locationStore = LocationStore()
 
     private var cancellables = Set<AnyCancellable>()
+    private var bannerTask: Task<Void, Never>?
 
     init() {
         cameraSession.objectWillChange
@@ -39,6 +40,7 @@ final class CaptureViewModel: ObservableObject {
 
     func onDisappear() {
         cameraSession.stopRunning()
+        clearBanner()
     }
 
     func capture(enableLookAroundVerification: Bool) {
@@ -63,7 +65,7 @@ final class CaptureViewModel: ObservableObject {
                 let data = try? await item.loadTransferable(type: Data.self),
                 let image = UIImage(data: data)
             else {
-                alertMessage = "Laterrr could not import that image."
+                alertMessage = "laterrr could not import that image."
                 return
             }
 
@@ -101,14 +103,36 @@ final class CaptureViewModel: ObservableObject {
         modelContext.insert(place)
         try? modelContext.save()
 
-        bannerMessage = "Saved \(suggestion.name) to Laterrr."
+        showBanner("Saved \(suggestion.name) to laterrr.")
 
         reviewState = nil
     }
 
+    func showBanner(_ message: String, autoDismissAfter delay: Duration? = .seconds(2.6)) {
+        bannerTask?.cancel()
+        bannerMessage = message
+
+        guard let delay else {
+            return
+        }
+
+        bannerTask = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                self?.bannerMessage = nil
+            }
+        }
+    }
+
+    func clearBanner() {
+        bannerTask?.cancel()
+        bannerMessage = nil
+    }
+
     private func analyze(photo: CapturedPhoto, enableLookAroundVerification: Bool) async {
         isAnalyzing = true
-        bannerMessage = nil
+        clearBanner()
 
         let analysis = await PlaceCapturePipeline.analyze(
             photoData: photo.data,

@@ -2,13 +2,17 @@ import AVFoundation
 import PhotosUI
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct CaptureView: View {
     @EnvironmentObject private var settingsStore: SettingsStore
+    @EnvironmentObject private var tikTokImportCoordinator: TikTokImportCoordinator
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = CaptureViewModel()
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var pinchBaseZoomFactor: CGFloat?
+    @State private var pastedTikTokURLString = ""
+    @State private var isTikTokPasteSheetPresented = false
 
     var body: some View {
         ZStack {
@@ -35,6 +39,16 @@ struct CaptureView: View {
                 enableLookAroundVerification: settingsStore.enableLookAroundVerification
             )
         }
+        .onChange(of: tikTokImportCoordinator.isImporting) { _, isImporting in
+            if !isImporting {
+                viewModel.clearBanner()
+            }
+        }
+        .onChange(of: tikTokImportCoordinator.reviewState?.id) { _, reviewID in
+            if reviewID != nil {
+                viewModel.clearBanner()
+            }
+        }
         .sheet(item: $viewModel.reviewState) { reviewState in
             CaptureReviewSheet(
                 reviewState: reviewState,
@@ -53,6 +67,14 @@ struct CaptureView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $isTikTokPasteSheetPresented) {
+            TikTokPasteImportSheet(
+                urlString: $pastedTikTokURLString,
+                importAction: handleTikTokImport
+            )
+            .presentationDetents([.height(320)])
+            .presentationDragIndicator(.visible)
+        }
         .alert("Capture issue", isPresented: Binding(
             get: { viewModel.alertMessage != nil },
             set: { if !$0 { viewModel.alertMessage = nil } }
@@ -64,7 +86,7 @@ struct CaptureView: View {
         .overlay(alignment: .top) {
             if let bannerMessage = viewModel.bannerMessage {
                 Text(bannerMessage)
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .font(LaterrrTypography.caption(.subheadline))
                     .foregroundStyle(LaterrrPalette.textPrimary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
@@ -89,6 +111,12 @@ struct CaptureView: View {
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .gesture(cameraZoomGesture)
+        } else if isCameraLoading {
+            LaterrrLoadingView(
+                title: "loading camera",
+                message: "laterrr is warming up the camera so you can capture the place in one shot."
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(spacing: 20) {
                 Image(systemName: "cup.and.saucer.fill")
@@ -96,18 +124,18 @@ struct CaptureView: View {
                     .foregroundStyle(LaterrrPalette.accent)
 
                 Text("Point at the storefront")
-                    .font(.system(size: 34, weight: .black, design: .rounded))
+                    .font(LaterrrTypography.display(36))
                     .foregroundStyle(LaterrrPalette.textPrimary)
 
-                Text("Take a clean venue shot and Laterrr checks the sign text against places nearby.")
-                    .font(.system(.title3, design: .rounded))
+                Text("Take a clean venue shot and laterrr checks the sign text against places nearby.")
+                    .font(LaterrrTypography.body(.title3))
                     .foregroundStyle(LaterrrPalette.textSecondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 420)
 
                 if viewModel.cameraSession.authorizationStatus != .authorized {
                     Text("Camera permission is off right now. You can still import a photo from your library below.")
-                        .font(.system(.body, design: .rounded))
+                        .font(LaterrrTypography.body())
                         .foregroundStyle(LaterrrPalette.textSecondary)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 420)
@@ -115,6 +143,12 @@ struct CaptureView: View {
             }
             .padding(24)
         }
+    }
+
+    private var isCameraLoading: Bool {
+        let status = viewModel.cameraSession.authorizationStatus
+        let hasNoError = viewModel.cameraSession.lastError == nil
+        return hasNoError && (status == .notDetermined || (status == .authorized && !viewModel.cameraSession.isConfigured))
     }
 
     private var captureControls: some View {
@@ -158,9 +192,26 @@ struct CaptureView: View {
 
             Spacer()
 
-            Circle()
-                .fill(Color.clear)
-                .frame(width: 56, height: 56)
+            Button {
+                pastedTikTokURLString = TikTokImportURLParser.clipboardCandidate(
+                    from: UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString
+                )
+                isTikTokPasteSheetPresented = true
+            } label: {
+                Image(systemName: "link")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    .frame(width: 56, height: 56)
+                    .glassEffect(
+                        Glass.regular.tint(Color.white.opacity(0.68)),
+                        in: Circle()
+                    )
+                    .overlay {
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                    }
+            }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
@@ -184,13 +235,13 @@ struct CaptureView: View {
                         .scaleEffect(1.2)
 
                     Text("Finding the best nearby match")
-                        .font(.system(.headline, design: .rounded))
+                        .font(LaterrrTypography.headline())
                         .foregroundStyle(LaterrrPalette.textPrimary)
 
                     Text(settingsStore.enableLookAroundVerification
-                         ? "Laterrr is reading the sign, checking nearby places, and verifying strong candidates with Look Around where available."
-                         : "Laterrr is reading the sign, checking nearby places, and trimming anything that looks too far away.")
-                        .font(.system(.body, design: .rounded))
+                         ? "laterrr is reading the sign, checking nearby places, and verifying strong candidates with Look Around where available."
+                         : "laterrr is reading the sign, checking nearby places, and trimming anything that looks too far away.")
+                        .font(LaterrrTypography.body())
                         .foregroundStyle(LaterrrPalette.textSecondary)
                         .multilineTextAlignment(.center)
                 }
@@ -212,6 +263,21 @@ struct CaptureView: View {
             .onEnded { _ in
                 pinchBaseZoomFactor = nil
             }
+    }
+
+    private func handleTikTokImport(_ rawURLString: String) -> String? {
+        switch tikTokImportCoordinator.enqueueImport(from: rawURLString) {
+        case let .success(outcome):
+            switch outcome {
+            case .started:
+                break
+            case .queued:
+                viewModel.showBanner("TikTok list queued for review.")
+            }
+            return nil
+        case let .failure(error):
+            return error.localizedDescription
+        }
     }
 }
 
@@ -240,6 +306,81 @@ private final class PreviewView: UIView {
     }
 }
 
+private struct TikTokPasteImportSheet: View {
+    @Binding var urlString: String
+
+    let importAction: (String) -> String?
+
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var isURLFieldFocused: Bool
+    @State private var errorMessage: String?
+
+    var body: some View {
+        ZStack {
+            LaterrrBackground()
+
+            VStack(alignment: .leading, spacing: 18) {
+                Text("Import TikTok list")
+                    .font(LaterrrTypography.display(30))
+                    .foregroundStyle(LaterrrPalette.textPrimary)
+
+                Text("Paste a TikTok URL and laterrr will turn it into swipeable place cards.")
+                    .font(LaterrrTypography.body())
+                    .foregroundStyle(LaterrrPalette.textSecondary)
+
+                TextField("https://vt.tiktok.com/...", text: $urlString, axis: .vertical)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.URL)
+                    .autocorrectionDisabled()
+                    .focused($isURLFieldFocused)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.9), lineWidth: 1)
+                    }
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(LaterrrTypography.body(.subheadline))
+                        .foregroundStyle(.red.opacity(0.88))
+                }
+
+                HStack(spacing: 12) {
+                    Button {
+                        urlString = TikTokImportURLParser.clipboardCandidate(
+                            from: UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString
+                        )
+                        errorMessage = nil
+                    } label: {
+                        Label("Paste", systemImage: "doc.on.clipboard")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.glass)
+
+                    Button {
+                        if let errorMessage = importAction(urlString) {
+                            self.errorMessage = errorMessage
+                        } else {
+                            dismiss()
+                        }
+                    } label: {
+                        Label("Import for later!", systemImage: "sparkles")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.glassProminent)
+                    .disabled(urlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .padding(20)
+        }
+        .onAppear {
+            isURLFieldFocused = urlString.isEmpty
+        }
+    }
+}
+
 private struct CaptureReviewSheet: View {
     let reviewState: CaptureReviewState
     let settingsStore: SettingsStore
@@ -256,17 +397,17 @@ private struct CaptureReviewSheet: View {
 
                     GlassCard {
                         Text("Best match")
-                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .font(LaterrrTypography.display(28))
                             .foregroundStyle(LaterrrPalette.textPrimary)
 
                         Text(reviewState.analysis.narrative)
-                            .font(.system(.body, design: .rounded))
+                            .font(LaterrrTypography.body())
                             .foregroundStyle(LaterrrPalette.textSecondary)
 
                         if !reviewState.analysis.extractedText.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Read from the photo")
-                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .font(LaterrrTypography.caption(.subheadline))
                                     .foregroundStyle(LaterrrPalette.textSecondary)
 
                                 FlowLayout(reviewState.analysis.extractedText)
@@ -287,11 +428,11 @@ private struct CaptureReviewSheet: View {
                                     HStack(alignment: .top) {
                                         VStack(alignment: .leading, spacing: 8) {
                                             Text(suggestion.name)
-                                                .font(.system(.title3, design: .rounded, weight: .bold))
+                                                .font(LaterrrTypography.display(26))
                                                 .foregroundStyle(LaterrrPalette.textPrimary)
 
                                             Text(suggestion.shortAddress)
-                                                .font(.system(.body, design: .rounded))
+                                                .font(LaterrrTypography.body())
                                                 .foregroundStyle(LaterrrPalette.textSecondary)
                                         }
 
@@ -306,11 +447,11 @@ private struct CaptureReviewSheet: View {
                                             Label("\(Int(suggestion.distanceMeters.rounded())) m", systemImage: "figure.walk")
                                         }
                                     }
-                                    .font(.system(.caption, design: .rounded, weight: .semibold))
+                                    .font(LaterrrTypography.caption())
                                     .foregroundStyle(LaterrrPalette.textSecondary)
 
                                     Text(suggestion.rationale)
-                                        .font(.system(.subheadline, design: .rounded))
+                                        .font(LaterrrTypography.body(.subheadline))
                                         .foregroundStyle(LaterrrPalette.textSecondary)
 
                                     LookAroundSection(preview: suggestion.lookAroundPreview)
@@ -353,11 +494,11 @@ private struct CaptureReviewSheet: View {
             .overlay(alignment: .bottomLeading) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(reviewState.analysis.analysisMethod)
-                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .font(LaterrrTypography.caption())
                         .foregroundStyle(LaterrrPalette.textPrimary)
 
                     Text("Pick the right venue if the photo frame caught more than one place.")
-                        .font(.system(.headline, design: .rounded))
+                        .font(LaterrrTypography.headline())
                         .foregroundStyle(LaterrrPalette.textPrimary)
                 }
                 .padding(18)
@@ -381,14 +522,14 @@ private struct LookAroundSection: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Label("Look Around", systemImage: "binoculars")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .font(LaterrrTypography.caption(.subheadline))
                     .foregroundStyle(LaterrrPalette.textPrimary)
 
                 Spacer()
 
                 if let verificationScore = preview.verificationScore {
                     Text("\(Int((verificationScore * 100).rounded()))%")
-                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .font(LaterrrTypography.caption())
                         .foregroundStyle(LaterrrPalette.textPrimary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -398,7 +539,7 @@ private struct LookAroundSection: View {
                         )
                 } else {
                     Text(preview.availability.title)
-                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .font(LaterrrTypography.caption())
                         .foregroundStyle(LaterrrPalette.textPrimary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -427,14 +568,14 @@ private struct LookAroundSection: View {
                                 .foregroundStyle(LaterrrPalette.textSecondary)
 
                             Text(preview.availability == .disabled ? "Look Around off" : "Not available here")
-                                .font(.system(.headline, design: .rounded))
+                                .font(LaterrrTypography.headline())
                                 .foregroundStyle(LaterrrPalette.textPrimary)
                         }
                     }
             }
 
             Text(preview.summary)
-                .font(.system(.footnote, design: .rounded))
+                .font(LaterrrTypography.body(.footnote))
                 .foregroundStyle(LaterrrPalette.textSecondary)
 
             if !preview.matchedTokens.isEmpty {
@@ -465,7 +606,7 @@ private struct FlowLayout: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 8)], alignment: .leading, spacing: 8) {
                 ForEach(items, id: \.self) { item in
                     Text(item)
-                        .font(.system(.footnote, design: .rounded, weight: .semibold))
+                        .font(LaterrrTypography.caption(.footnote))
                         .foregroundStyle(LaterrrPalette.textPrimary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
