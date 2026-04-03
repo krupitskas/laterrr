@@ -43,6 +43,7 @@
 		BA523D041E2D0B4B0C6E7E4D /* SavedPlaceSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEA9CC20AA4DD40733989536 /* SavedPlaceSource.swift */; };
 		BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E54173E655D3C7D69B2BDC67 /* RootView.swift */; };
 		D13E1489513A12939B9579B0 /* NearbyVenueSearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */; };
+		D7A6B2F115FFED623B62B2C3 /* ForegroundHumanDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A54D6A01C45E442BCC64 /* ForegroundHumanDetector.swift */; };
 		DB05AD38679BA7204C94DF87 /* MobileCLIPVenueScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916940500168220B2D87AEE0 /* MobileCLIPVenueScorer.swift */; };
 		DD56AEA2A7975EEEB6F6CF03 /* FoodVenueExteriorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */; };
 		E2FF6B5411ADC6318F47E170 /* TikTokPlaceParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755CAF0187C961B09C8CC695 /* TikTokPlaceParser.swift */; };
@@ -122,6 +123,7 @@
 		A8A2D05381379E8C8A6453C4 /* GPT2ByteEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT2ByteEncoder.swift; sourceTree = "<group>"; };
 		BDAE8E30DD655258755853B9 /* TikTokImportURLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TikTokImportURLParser.swift; sourceTree = "<group>"; };
 		D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodVenueExteriorClassifier.swift; sourceTree = "<group>"; };
+		D604A54D6A01C45E442BCC64 /* ForegroundHumanDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundHumanDetector.swift; sourceTree = "<group>"; };
 		D8212693F75F64B0C10AA073 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		DBFED253B31B2D16F2C448B6 /* clip-vocab.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clip-vocab.json"; sourceTree = "<group>"; };
 		DE6CF5903E018CB0E839C583 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 			children = (
 				9DCDB87AD99F1DF3FD0EE7BC /* CameraSessionModel.swift */,
 				D3F6F248B018857163CC2548 /* FoodVenueExteriorClassifier.swift */,
+				D604A54D6A01C45E442BCC64 /* ForegroundHumanDetector.swift */,
 				FCB3A723AAE07DE2B1541DBE /* LocationStore.swift */,
 				2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */,
 				7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */,
@@ -459,6 +462,7 @@
 				93493B5C06F70C0CA6E26BE5 /* CaptureView.swift in Sources */,
 				236DC46B9B0B0F9AD17D51D5 /* CaptureViewModel.swift in Sources */,
 				DD56AEA2A7975EEEB6F6CF03 /* FoodVenueExteriorClassifier.swift in Sources */,
+				D7A6B2F115FFED623B62B2C3 /* ForegroundHumanDetector.swift in Sources */,
 				E951D768906916561AAC03D2 /* GPT2ByteEncoder.swift in Sources */,
 				9EB4FBCB04A5B0CF4519275E /* LaterrrApp.swift in Sources */,
 				601EA0174E7D455FA3561014 /* LaterrrVisuals.swift in Sources */,

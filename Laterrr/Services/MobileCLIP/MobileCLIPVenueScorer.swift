@@ -34,9 +34,11 @@ actor MobileCLIPVenueScorer {
     private static let promptCatalog: [MobileCLIPPromptDefinition] = [
         .init(identifier: "cafe_exterior", text: "a photo of the exterior of a cafe", kind: .positive),
         .init(identifier: "cafe_storefront", text: "a photo of a cafe storefront", kind: .positive),
+        .init(identifier: "cafe_exterior_sign", text: "a photo of a cafe sign above a storefront", kind: .positive),
         .init(identifier: "coffee_shop_exterior", text: "a photo of the exterior of a coffee shop", kind: .positive),
         .init(identifier: "restaurant_exterior", text: "a photo of the exterior of a restaurant", kind: .positive),
         .init(identifier: "restaurant_storefront", text: "a street photo of a restaurant storefront", kind: .positive),
+        .init(identifier: "restaurant_exterior_sign", text: "a photo of a restaurant sign above an entrance", kind: .positive),
         .init(identifier: "bakery_exterior", text: "a photo of a bakery storefront", kind: .positive),
         .init(identifier: "bistro_exterior", text: "a photo of a bistro exterior", kind: .positive),
         .init(identifier: "brasserie_exterior", text: "a photo of a brasserie facade", kind: .positive),
@@ -44,6 +46,8 @@ actor MobileCLIPVenueScorer {
         .init(identifier: "storefront_exterior", text: "a photo of a storefront on a city street", kind: .context),
         .init(identifier: "building_facade", text: "a photo of a building facade", kind: .context),
         .init(identifier: "shop_exterior", text: "a photo of a shop exterior", kind: .context),
+        .init(identifier: "storefront_signage", text: "a photo of storefront signage on a building exterior", kind: .context),
+        .init(identifier: "shop_entrance", text: "a photo of a shop entrance from the sidewalk", kind: .context),
         .init(identifier: "urban_streetfront", text: "a photo of an urban streetfront", kind: .context),
         .init(identifier: "awning_storefront", text: "a photo of a storefront with an awning", kind: .context),
         .init(identifier: "home_interior", text: "a photo of a home interior", kind: .negative),
@@ -57,7 +61,13 @@ actor MobileCLIPVenueScorer {
         .init(identifier: "toilet_sign", text: "a photo of a toilet sign", kind: .negative),
         .init(identifier: "office_sign", text: "a photo of an office door sign", kind: .negative),
         .init(identifier: "food_closeup", text: "a close up photo of food on a table", kind: .negative),
-        .init(identifier: "drink_closeup", text: "a close up photo of a drink on a table", kind: .negative)
+        .init(identifier: "drink_closeup", text: "a close up photo of a drink on a table", kind: .negative),
+        .init(identifier: "restaurant_interior", text: "a photo of the inside of a restaurant", kind: .negative),
+        .init(identifier: "cafe_interior", text: "a photo of the inside of a cafe", kind: .negative),
+        .init(identifier: "person_at_restaurant_table", text: "a portrait of a person sitting at a restaurant table", kind: .negative),
+        .init(identifier: "people_dining_indoors", text: "a photo of people dining indoors", kind: .negative),
+        .init(identifier: "selfie_in_cafe", text: "a selfie taken inside a cafe", kind: .negative),
+        .init(identifier: "indoor_dining_room", text: "a photo of an indoor dining room", kind: .negative)
     ]
 
     private let ciContext = CIContext()
@@ -92,16 +102,16 @@ actor MobileCLIPVenueScorer {
             let negativeConfidence = bestSimilarity(in: scores, kind: .negative)
             let confidence = max(
                 0,
-                positiveConfidence + (contextConfidence * 0.40) - (negativeConfidence * 0.85)
+                positiveConfidence + (contextConfidence * 0.45) - (negativeConfidence * 1.05)
             )
 
-            let isLikelyExteriorVenue = positiveConfidence >= 0.20
+            let isLikelyExteriorVenue = positiveConfidence >= 0.22
                 && (
-                    positiveConfidence >= (negativeConfidence - 0.01)
-                        || (contextConfidence >= 0.17 && positiveConfidence >= 0.18)
+                    (contextConfidence >= 0.17 && positiveConfidence >= 0.17)
+                        || positiveConfidence >= (negativeConfidence + 0.04)
                 )
             let isLikelyExteriorContext = contextConfidence >= 0.18
-                && contextConfidence >= (negativeConfidence - 0.02)
+                && contextConfidence >= (negativeConfidence + 0.01)
 
             let labels = scores
                 .sorted { $0.similarity > $1.similarity }

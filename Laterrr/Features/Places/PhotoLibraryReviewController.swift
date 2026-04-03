@@ -281,10 +281,19 @@ enum PhotoLibraryReviewService {
             return nil
         }
 
+        let humanAssessment = await ForegroundHumanDetector.assess(photoData: photoData)
+        guard PhotoPlaceFilter.shouldInspect(
+            exteriorAssessment: exteriorAssessment,
+            humanAssessment: humanAssessment
+        ) else {
+            return nil
+        }
+
         let extractedText = await VenueTextRecognizer.recognizeText(in: photoData)
         let sceneAssessment = PhotoPlaceFilter.assess(
             extractedText: extractedText,
-            exteriorAssessment: exteriorAssessment
+            exteriorAssessment: exteriorAssessment,
+            humanAssessment: humanAssessment
         )
 
         guard sceneAssessment.shouldAnalyze else { return nil }
@@ -460,6 +469,7 @@ private enum PhotoPlaceFilter {
         "bistro_exterior",
         "brasserie_exterior",
         "cafe_exterior",
+        "cafe_exterior_sign",
         "cafe_storefront",
         "cafeteria",
         "coffee",
@@ -467,11 +477,12 @@ private enum PhotoPlaceFilter {
         "coffee_shop_exterior",
         "restaurant",
         "restaurant_exterior",
+        "restaurant_exterior_sign",
         "restaurant_storefront"
     ]
 
     private static let foodSceneKeywords: [String] = [
-        "restaurant", "coffee", "bakery", "bistro", "cafe", "terrace", "patio"
+        "restaurant", "coffee", "bakery", "bistro", "cafe", "sign", "terrace", "patio"
     ]
 
     private static let placeContextIdentifiers: Set<String> = [
@@ -479,7 +490,9 @@ private enum PhotoPlaceFilter {
         "building",
         "building_facade",
         "shop_exterior",
+        "shop_entrance",
         "storefront_exterior",
+        "storefront_signage",
         "street",
         "street_sign",
         "urban_streetfront"
@@ -487,7 +500,7 @@ private enum PhotoPlaceFilter {
 
     private static let placeContextKeywords: [String] = [
         "building", "architecture", "street", "city", "urban", "road", "sidewalk",
-        "plaza", "square", "store", "shop", "market", "facade"
+        "plaza", "square", "store", "shop", "market", "facade", "sign", "entrance", "front"
     ]
 
     private static let negativeSceneIdentifiers: Set<String> = [
@@ -499,10 +512,14 @@ private enum PhotoPlaceFilter {
         "food_closeup",
         "home_interior",
         "living_room_couch",
+        "people_dining_indoors",
+        "person_at_restaurant_table",
         "menu_closeup",
         "office_sign",
         "painting",
         "receipt",
+        "restaurant_interior",
+        "selfie_in_cafe",
         "sofa",
         "toilet_seat",
         "toilet_sign"
@@ -511,7 +528,8 @@ private enum PhotoPlaceFilter {
     private static let negativeSceneKeywords: [String] = [
         "dog", "cat", "pet", "couch", "sofa", "bed", "bedroom", "blanket", "painting",
         "artwork", "menu", "receipt", "invoice", "food", "plate", "dish", "dessert",
-        "drink", "cocktail", "wine", "beer", "living room", "toilet"
+        "drink", "cocktail", "wine", "beer", "living room", "toilet", "interior",
+        "portrait", "people", "selfie", "table"
     ]
 
     static func shouldInspect(exteriorAssessment: FoodVenueExteriorAssessment) -> Bool {
@@ -521,25 +539,56 @@ private enum PhotoPlaceFilter {
             return false
         }
 
-        return exteriorAssessment.isLikelyExteriorVenue
-            || exteriorAssessment.isLikelyExteriorContext
-            || exteriorAssessment.positiveConfidence >= 0.18
-            || exteriorAssessment.confidence >= 0.07
+        if exteriorAssessment.isLikelyExteriorVenue && exteriorAssessment.contextConfidence >= 0.15 {
+            return true
+        }
+
+        if exteriorAssessment.isLikelyExteriorContext && exteriorAssessment.negativeConfidence < 0.34 {
+            return true
+        }
+
+        return (
+            exteriorAssessment.contextConfidence >= 0.16
+                || exteriorAssessment.positiveConfidence >= 0.22
+        )
+            && exteriorAssessment.negativeConfidence < 0.34
+    }
+
+    static func shouldInspect(
+        exteriorAssessment: FoodVenueExteriorAssessment,
+        humanAssessment: ForegroundHumanAssessment
+    ) -> Bool {
+        if humanAssessment.hasDominantForegroundPerson,
+           exteriorAssessment.contextConfidence < 0.14,
+           exteriorAssessment.positiveConfidence < 0.22 {
+            return false
+        }
+
+        if humanAssessment.centeredFaceArea >= 0.028,
+           exteriorAssessment.contextConfidence < 0.16,
+           exteriorAssessment.positiveConfidence < 0.24 {
+            return false
+        }
+
+        return true
     }
 
     static func assess(
         extractedText: [String],
-        exteriorAssessment: FoodVenueExteriorAssessment
+        exteriorAssessment: FoodVenueExteriorAssessment,
+        humanAssessment: ForegroundHumanAssessment
     ) -> PhotoSceneAssessment {
         performAssessment(
             extractedText: extractedText,
-            exteriorAssessment: exteriorAssessment
+            exteriorAssessment: exteriorAssessment,
+            humanAssessment: humanAssessment
         )
     }
 
     private static func performAssessment(
         extractedText: [String],
-        exteriorAssessment: FoodVenueExteriorAssessment
+        exteriorAssessment: FoodVenueExteriorAssessment,
+        humanAssessment: ForegroundHumanAssessment
     ) -> PhotoSceneAssessment {
         let normalizedText = extractedText.map { $0.lowercased() }
         let rejectedTextHits = normalizedText.filter { rejectedTextKeywords.contains($0) }
@@ -586,13 +635,24 @@ private enum PhotoPlaceFilter {
         )
 
         let isLikelyFoodPlaceScene = exteriorAssessment.isLikelyExteriorVenue
-            || (foodScore >= 0.18 && negativeScore < 0.30)
+            || (foodScore >= 0.22 && placeScore >= 0.16 && negativeScore < 0.28)
             || (foodTextHitCount >= 1 && placeScore >= 0.17 && negativeScore < 0.30)
         let isLikelyPlaceScene = isLikelyFoodPlaceScene
             || exteriorAssessment.isLikelyExteriorContext
-            || (placeScore >= 0.18 && negativeScore < 0.32)
+            || (placeScore >= 0.16 && negativeScore < 0.34)
 
-        if negativeScore >= 0.32, !isLikelyFoodPlaceScene, foodTextHitCount == 0 {
+        if humanAssessment.hasDominantForegroundPerson,
+           placeScore < 0.16,
+           foodTextHitCount == 0,
+           strongVenueTextCount == 0 {
+            return PhotoSceneAssessment(
+                shouldAnalyze: false,
+                isLikelyPlaceScene: false,
+                isLikelyFoodPlaceScene: false
+            )
+        }
+
+        if negativeScore >= 0.36, !isLikelyPlaceScene, foodTextHitCount == 0, strongVenueTextCount == 0 {
             return PhotoSceneAssessment(
                 shouldAnalyze: false,
                 isLikelyPlaceScene: false,
@@ -601,8 +661,13 @@ private enum PhotoPlaceFilter {
         }
 
         let shouldAnalyze = isLikelyFoodPlaceScene
+            || (isLikelyPlaceScene && negativeScore < 0.34)
             || (foodTextHitCount >= 1 && isLikelyPlaceScene)
-            || (strongVenueTextCount >= 2 && placeScore >= 0.18 && negativeScore < 0.30)
+            || (
+                strongVenueTextCount >= 1
+                    && placeScore >= 0.14
+                    && negativeScore < 0.34
+            )
 
         return PhotoSceneAssessment(
             shouldAnalyze: shouldAnalyze,
