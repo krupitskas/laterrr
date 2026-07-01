@@ -8,6 +8,7 @@ struct LaterrrApp: App {
     private let modelContainer = LaterrrModelContainer.shared
 
     init() {
+        LaterrrFonts.registerBundledFonts()
         LaterrrChrome.configureNavigationAppearance()
     }
 
@@ -15,6 +16,7 @@ struct LaterrrApp: App {
         WindowGroup {
             RootView()
                 .font(LaterrrTypography.body())
+                .foregroundStyle(LaterrrPalette.ink)
                 .environmentObject(settingsStore)
                 .environmentObject(tikTokImportCoordinator)
         }

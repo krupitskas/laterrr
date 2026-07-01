@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FB0000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000001 /* Assets.xcassets */; };
+		FB0000000000000000000002 /* InstrumentSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */; };
+		FB0000000000000000000003 /* InstrumentSerif-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */; };
 		05DA2C36A751DEE84A3BC26F /* SavedPlacePreviewImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13C1ADE6131666B8A48A012 /* SavedPlacePreviewImage.swift */; };
 		0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */; };
 		12266529E9B2171917E8FB74 /* LookAroundSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */; };
@@ -72,6 +75,12 @@
 			remoteInfo = LaterrrShareExtension;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section (Laterrr resources) */
+		FA0000000000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Regular.ttf"; sourceTree = "<group>"; };
+		FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Italic.ttf"; sourceTree = "<group>"; };
+/* End PBXFileReference section (Laterrr resources) */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8E81E1EF7CB2EE7CA41C066A /* Embed Foundation Extensions */ = {
@@ -165,9 +174,20 @@
 		33CF948A45BD86EFEED48F49 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FA0000000000000000000001 /* Assets.xcassets */,
+				FA0000000000000000000004 /* Fonts */,
 				A85EEB539F2386CAF26BCE83 /* MobileCLIP */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		FA0000000000000000000004 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */,
+				FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		3FB7069F39AB585488E2CFEE = {
@@ -438,6 +458,9 @@
 			files = (
 				92DF596AABCA1E8881FC06BB /* clip-merges.txt in Resources */,
 				6B23997F47BFDAC8CCD438A3 /* clip-vocab.json in Resources */,
+				FB0000000000000000000001 /* Assets.xcassets in Resources */,
+				FB0000000000000000000002 /* InstrumentSerif-Regular.ttf in Resources */,
+				FB0000000000000000000003 /* InstrumentSerif-Italic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

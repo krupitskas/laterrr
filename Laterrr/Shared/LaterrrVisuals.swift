@@ -1,50 +1,91 @@
+import CoreText
 import SwiftUI
 import UIKit
 
+// MARK: - Palette
+// Monochrome editorial system: pure ink on pure canvas.
+// Light mode is canonical; dark mode is a clean inversion of the same two tones.
+
 enum LaterrrPalette {
-    static let canvas = Color(red: 0.96, green: 0.97, blue: 0.995)
-    static let canvasHighlight = Color(red: 0.84, green: 0.88, blue: 1.0)
-    static let canvasAccent = Color(red: 0.94, green: 0.87, blue: 0.99)
-    static let accent = Color(red: 0.47, green: 0.40, blue: 0.83)
-    static let accentBright = Color(red: 0.78, green: 0.88, blue: 1.0)
-    static let accentSoft = Color(red: 0.89, green: 0.86, blue: 0.99)
-    static let textPrimary = Color(red: 0.05, green: 0.06, blue: 0.11)
-    static let textSecondary = Color(red: 0.18, green: 0.20, blue: 0.29)
-    static let cardStroke = Color.white.opacity(0.96)
-    static let shadow = Color(red: 0.16, green: 0.14, blue: 0.30).opacity(0.12)
+    static let uiInk = UIColor { traits in
+        traits.userInterfaceStyle == .dark ? .white : .black
+    }
+
+    static let uiCanvas = UIColor { traits in
+        traits.userInterfaceStyle == .dark ? .black : .white
+    }
+
+    static let ink = Color(uiInk)
+    static let canvas = Color(uiCanvas)
+    static let inkSecondary = ink.opacity(0.55)
+    static let inkTertiary = ink.opacity(0.45)
 }
 
+// MARK: - Fonts
+
+enum LaterrrFonts {
+    static let serif = "InstrumentSerif-Regular"
+    static let serifItalic = "InstrumentSerif-Italic"
+
+    static func registerBundledFonts() {
+        for fontName in [serif, serifItalic] {
+            guard
+                UIFont(name: fontName, size: 12) == nil,
+                let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf")
+            else { continue }
+
+            CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
+        }
+    }
+}
+
+// MARK: - Typography
+// Serif is only for display headings, place names, and short italic accents.
+// Everything functional is sans; small labels are uppercase letterspaced micro type.
+
 enum LaterrrTypography {
-    static func display(_ size: CGFloat) -> Font {
-        .system(size: size, weight: .semibold, design: .serif)
+    static func display(_ size: CGFloat, italic: Bool = false) -> Font {
+        let fontName = italic ? LaterrrFonts.serifItalic : LaterrrFonts.serif
+
+        if UIFont(name: fontName, size: size) != nil {
+            return .custom(fontName, size: size, relativeTo: .largeTitle)
+        }
+
+        let fallback = Font.system(size: size, weight: .regular, design: .serif)
+        return italic ? fallback.italic() : fallback
     }
 
-    static func headline(_ textStyle: UIFont.TextStyle = .headline) -> Font {
-        let size = UIFont.preferredFont(forTextStyle: textStyle).pointSize
-        return .system(size: size, weight: .semibold, design: .serif)
+    static func accent(_ size: CGFloat = 16) -> Font {
+        display(size, italic: true)
     }
 
-    static func body(_ textStyle: UIFont.TextStyle = .body) -> Font {
-        let size = UIFont.preferredFont(forTextStyle: textStyle).pointSize
-        return .system(size: size, weight: .regular, design: .serif)
+    static func headline(_ textStyle: Font.TextStyle = .headline) -> Font {
+        .system(textStyle, design: .default, weight: .semibold)
     }
 
-    static func caption(_ textStyle: UIFont.TextStyle = .caption1) -> Font {
-        let size = UIFont.preferredFont(forTextStyle: textStyle).pointSize
-        return .system(size: size, weight: .medium, design: .serif)
+    static func body(_ textStyle: Font.TextStyle = .body) -> Font {
+        .system(textStyle, design: .default, weight: .regular)
+    }
+
+    static func caption(_ textStyle: Font.TextStyle = .caption) -> Font {
+        .system(textStyle, design: .default, weight: .medium)
+    }
+
+    static func micro(_ size: CGFloat = 10) -> Font {
+        .system(size: size, weight: .semibold)
     }
 
     static func uiDisplay(_ size: CGFloat) -> UIFont {
-        systemSerifUIFont(size: size, weight: .semibold)
+        UIFont(name: LaterrrFonts.serif, size: size) ?? systemSerifUIFont(size: size)
     }
 
     static func uiHeadline(_ textStyle: UIFont.TextStyle = .headline) -> UIFont {
         let size = UIFont.preferredFont(forTextStyle: textStyle).pointSize
-        return systemSerifUIFont(size: size, weight: .semibold)
+        return uiDisplay(size)
     }
 
-    private static func systemSerifUIFont(size: CGFloat, weight: UIFont.Weight) -> UIFont {
-        let baseFont = UIFont.systemFont(ofSize: size, weight: weight)
+    private static func systemSerifUIFont(size: CGFloat) -> UIFont {
+        let baseFont = UIFont.systemFont(ofSize: size, weight: .regular)
         guard let serifDescriptor = baseFont.fontDescriptor.withDesign(.serif) else {
             return baseFont
         }
@@ -53,84 +94,100 @@ enum LaterrrTypography {
     }
 }
 
+// MARK: - Chrome
+
 enum LaterrrChrome {
     @MainActor
     static func configureNavigationAppearance() {
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundColor = .clear
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = LaterrrPalette.uiCanvas
+        appearance.shadowColor = LaterrrPalette.uiInk
         appearance.titleTextAttributes = [
             .font: LaterrrTypography.uiHeadline(),
-            .foregroundColor: UIColor(LaterrrPalette.textPrimary)
+            .foregroundColor: LaterrrPalette.uiInk
         ]
         appearance.largeTitleTextAttributes = [
             .font: LaterrrTypography.uiDisplay(36),
-            .foregroundColor: UIColor(LaterrrPalette.textPrimary)
+            .foregroundColor: LaterrrPalette.uiInk
         ]
 
         let navigationBar = UINavigationBar.appearance()
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
         navigationBar.compactAppearance = appearance
-        navigationBar.tintColor = UIColor(LaterrrPalette.accent)
+        navigationBar.tintColor = LaterrrPalette.uiInk
     }
 }
+
+// MARK: - Background
 
 struct LaterrrBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color.white,
-                    LaterrrPalette.canvas,
-                    Color(red: 0.93, green: 0.95, blue: 1.0)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            LaterrrPalette.accentBright.opacity(0.85),
-                            LaterrrPalette.canvasHighlight.opacity(0.25)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 360, height: 360)
-                .blur(radius: 70)
-                .offset(x: 150, y: -240)
-
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            LaterrrPalette.canvasAccent.opacity(0.92),
-                            Color.white.opacity(0.18)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 420, height: 420)
-                .blur(radius: 84)
-                .offset(x: -130, y: 280)
-
-            RoundedRectangle(cornerRadius: 44, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.42), lineWidth: 1)
-                .padding(10)
-
-            Rectangle()
-                .fill(Color.white.opacity(0.08))
-        }
-        .ignoresSafeArea()
+        LaterrrPalette.canvas
+            .ignoresSafeArea()
     }
 }
 
-struct GlassCard<Content: View>: View {
+// MARK: - Micro label
+// Uppercase, letterspaced grotesque label used for section heads, metadata, chips.
+
+struct MicroText: View {
+    let text: String
+    var size: CGFloat = 10
+    var kerning: CGFloat = 2
+    var color: Color = LaterrrPalette.ink
+
+    @ScaledMetric(relativeTo: .caption2) private var scale: CGFloat = 1
+
+    init(_ text: String, size: CGFloat = 10, kerning: CGFloat = 2, color: Color = LaterrrPalette.ink) {
+        self.text = text
+        self.size = size
+        self.kerning = kerning
+        self.color = color
+    }
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(LaterrrTypography.micro(size * scale))
+            .kerning(kerning)
+            .foregroundStyle(color)
+    }
+}
+
+// MARK: - Hairlines
+
+struct HairlineDivider: View {
+    var color: Color = LaterrrPalette.ink
+
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(height: 1)
+    }
+}
+
+struct InkKeyValueRow: View {
+    let key: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 16) {
+            MicroText(key, color: LaterrrPalette.inkSecondary)
+                .frame(width: 92, alignment: .leading)
+
+            Text(value)
+                .font(LaterrrTypography.body(.subheadline))
+                .foregroundStyle(LaterrrPalette.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, 12)
+    }
+}
+
+// MARK: - Card
+
+struct InkCard<Content: View>: View {
     let alignment: HorizontalAlignment
     let content: Content
 
@@ -144,82 +201,33 @@ struct GlassCard<Content: View>: View {
             content
         }
         .padding(18)
-        .glassEffect(
-            Glass.regular.tint(Color.white.opacity(0.74)),
-            in: RoundedRectangle(cornerRadius: 30, style: .continuous)
-        )
+        .frame(maxWidth: .infinity, alignment: Alignment(horizontal: alignment, vertical: .center))
+        .background(LaterrrPalette.canvas)
         .overlay {
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .strokeBorder(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.96),
-                            LaterrrPalette.accentBright.opacity(0.88),
-                            LaterrrPalette.accent.opacity(0.30)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.15
-                )
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
-        .shadow(color: LaterrrPalette.shadow, radius: 22, y: 12)
     }
 }
+
+// MARK: - Chips
 
 struct ConfidencePill: View {
     let score: Double
+    var caption: String = "MATCH"
 
     var body: some View {
         let clampedScore = min(max(score, 0), 1)
-        let tint = LinearGradient(
-            colors: [
-                Color.white.opacity(0.92),
-                LaterrrPalette.accentSoft.opacity(0.94),
-                LaterrrPalette.accentBright.opacity(0.70)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
 
-        Text("\(Int((clampedScore * 100).rounded()))% match")
-            .font(LaterrrTypography.caption())
-            .foregroundStyle(LaterrrPalette.textPrimary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .background(
-                Capsule()
-                    .fill(tint)
-            )
+        MicroText("\(Int((clampedScore * 100).rounded()))% \(caption)", size: 9, kerning: 1.5)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(LaterrrPalette.canvas)
             .overlay {
-                Capsule()
-                    .strokeBorder(Color.white.opacity(0.90), lineWidth: 1)
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
             }
-            .shadow(color: LaterrrPalette.shadow.opacity(0.65), radius: 16, y: 8)
-    }
-}
-
-struct EmptyStateView: View {
-    let title: String
-    let message: String
-    let systemImage: String
-
-    var body: some View {
-        GlassCard(alignment: .center) {
-            Image(systemName: systemImage)
-                .font(.system(size: 36, weight: .semibold))
-                .foregroundStyle(LaterrrPalette.accent)
-
-            Text(title)
-                .font(LaterrrTypography.display(24))
-                .foregroundStyle(LaterrrPalette.textPrimary)
-                .multilineTextAlignment(.center)
-
-            Text(message)
-                .font(LaterrrTypography.body())
-                .foregroundStyle(LaterrrPalette.textSecondary)
-                .multilineTextAlignment(.center)
-        }
     }
 }
 
@@ -227,53 +235,150 @@ struct LaterrrTag: View {
     let title: String
 
     var body: some View {
-        Text(title)
-            .font(LaterrrTypography.caption(.caption2))
-            .foregroundStyle(LaterrrPalette.textPrimary)
-            .padding(.horizontal, 11)
-            .padding(.vertical, 7)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.94),
-                                LaterrrPalette.accentSoft.opacity(0.72)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            )
+        MicroText(title, size: 9, kerning: 1.5)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(LaterrrPalette.canvas)
             .overlay {
-                Capsule(style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.84), lineWidth: 1)
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
             }
     }
 }
 
-struct LaterrrBrandStar: View {
-    let size: CGFloat
-    var isSpinning = false
+// MARK: - Buttons
+// Primary: ink fill, canvas micro label. Secondary: hairline outline.
+// Press state inverts fill and text; no color shift.
 
-    @State private var rotation: Double = 0
+struct InkButtonStyle: ButtonStyle {
+    var prominent: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        let isFilled = prominent != configuration.isPressed
+
+        configuration.label
+            .font(LaterrrTypography.micro(11))
+            .kerning(2)
+            .textCase(.uppercase)
+            .lineLimit(1)
+            .foregroundStyle(isFilled ? LaterrrPalette.canvas : LaterrrPalette.ink)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 15)
+            .background(isFilled ? LaterrrPalette.ink : LaterrrPalette.canvas)
+            .overlay {
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+            }
+            .contentShape(Rectangle())
+    }
+}
+
+extension ButtonStyle where Self == InkButtonStyle {
+    static var inkPrimary: InkButtonStyle { InkButtonStyle(prominent: true) }
+    static var inkOutline: InkButtonStyle { InkButtonStyle(prominent: false) }
+}
+
+// MARK: - Crosshatch
+// Fine 45° hatch used wherever the old design used gray fills.
+
+struct CrosshatchPattern: View {
+    var lineColor: Color = LaterrrPalette.ink
+    var lineOpacity: Double = 0.12
+    var spacing: CGFloat = 7
 
     var body: some View {
-        Image("BrandStar")
-            .resizable()
-            .interpolation(.high)
-            .scaledToFit()
-            .frame(width: size, height: size)
-            .rotationEffect(.degrees(rotation))
-            .shadow(color: LaterrrPalette.accent.opacity(0.18), radius: 18, y: 8)
-            .onAppear {
-                guard isSpinning else { return }
-                rotation = 360
+        Canvas { context, size in
+            var path = Path()
+            var offset = -size.height
+
+            while offset < size.width {
+                path.move(to: CGPoint(x: offset, y: 0))
+                path.addLine(to: CGPoint(x: offset + size.height, y: size.height))
+                offset += spacing
             }
-            .animation(
-                isSpinning ? .linear(duration: 1.35).repeatForever(autoreverses: false) : .default,
-                value: rotation
-            )
+
+            context.stroke(path, with: .color(lineColor.opacity(lineOpacity)), lineWidth: 1)
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+struct CrosshatchPlaceholder: View {
+    var caption: String?
+
+    var body: some View {
+        ZStack {
+            LaterrrPalette.canvas
+            CrosshatchPattern()
+
+            if let caption {
+                MicroText(caption, color: LaterrrPalette.inkSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(LaterrrPalette.canvas)
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                    }
+            }
+        }
+        .overlay {
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+        }
+    }
+}
+
+// MARK: - Loader
+// The single loading style: a spinning ink circle-outline carrying one ink dot.
+
+struct InkSpinner: View {
+    var size: CGFloat = 28
+    var color: Color = LaterrrPalette.ink
+
+    @State private var isSpinning = false
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            Circle()
+                .strokeBorder(color, lineWidth: 1.5)
+
+            Circle()
+                .fill(color)
+                .frame(width: size * 0.2, height: size * 0.2)
+                .offset(y: -size * 0.02)
+        }
+        .frame(width: size, height: size)
+        .rotationEffect(.degrees(isSpinning ? 360 : 0))
+        .onAppear {
+            withAnimation(.linear(duration: 1.1).repeatForever(autoreverses: false)) {
+                isSpinning = true
+            }
+        }
+        .accessibilityLabel("Loading")
+    }
+}
+
+struct InkProgressBar: View {
+    let value: Double
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .fill(LaterrrPalette.ink.opacity(0.15))
+                    .frame(height: 1)
+                    .frame(maxHeight: .infinity)
+
+                Rectangle()
+                    .fill(LaterrrPalette.ink)
+                    .frame(width: geometry.size.width * min(max(value, 0), 1), height: 3)
+            }
+        }
+        .frame(height: 3)
+        .accessibilityElement()
+        .accessibilityValue("\(Int((min(max(value, 0), 1) * 100).rounded())) percent")
     }
 }
 
@@ -283,18 +388,90 @@ struct LaterrrLoadingView: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            LaterrrBrandStar(size: 132, isSpinning: true)
+            InkSpinner(size: 40)
 
             Text(title)
                 .font(LaterrrTypography.display(28))
-                .foregroundStyle(LaterrrPalette.textPrimary)
+                .foregroundStyle(LaterrrPalette.ink)
+                .multilineTextAlignment(.center)
 
             Text(message)
-                .font(LaterrrTypography.body())
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .font(LaterrrTypography.body(.subheadline))
+                .foregroundStyle(LaterrrPalette.inkSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
         }
         .padding(28)
+    }
+}
+
+// MARK: - Empty state
+
+struct EmptyStateView: View {
+    let title: String
+    let message: String
+    let systemImage: String
+
+    var body: some View {
+        InkCard(alignment: .center) {
+            CrosshatchPlaceholder()
+                .frame(width: 72, height: 72)
+
+            Text(title)
+                .font(LaterrrTypography.display(26))
+                .foregroundStyle(LaterrrPalette.ink)
+                .multilineTextAlignment(.center)
+
+            Text(message)
+                .font(LaterrrTypography.body(.subheadline))
+                .foregroundStyle(LaterrrPalette.inkSecondary)
+                .multilineTextAlignment(.center)
+        }
+    }
+}
+
+// MARK: - Tab bar
+// Flat editorial bar: hairline top rule, uppercase micro labels, active tab underlined.
+
+struct EditorialTabBar<Selection: Hashable>: View {
+    let items: [(title: String, value: Selection)]
+    @Binding var selection: Selection
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HairlineDivider()
+
+            HStack(spacing: 0) {
+                ForEach(items.indices, id: \.self) { index in
+                    let item = items[index]
+                    let isActive = selection == item.value
+
+                    Button {
+                        selection = item.value
+                    } label: {
+                        VStack(spacing: 6) {
+                            MicroText(
+                                item.title,
+                                size: 9,
+                                kerning: 1.5,
+                                color: isActive ? LaterrrPalette.ink : LaterrrPalette.inkTertiary
+                            )
+
+                            Rectangle()
+                                .fill(isActive ? LaterrrPalette.ink : Color.clear)
+                                .frame(width: 26, height: 2)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 14)
+                        .padding(.bottom, 4)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(item.title)
+                    .accessibilityAddTraits(isActive ? [.isSelected] : [])
+                }
+            }
+        }
+        .background(LaterrrPalette.canvas)
     }
 }

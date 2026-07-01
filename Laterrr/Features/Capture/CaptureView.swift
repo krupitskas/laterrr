@@ -19,11 +19,11 @@ struct CaptureView: View {
             LaterrrBackground()
 
             cameraOrFallback
-                .overlay(alignment: .bottom) {
-                    captureControls
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
-                }
+
+            captureControls
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+                .frame(maxHeight: .infinity, alignment: .bottom)
 
             if viewModel.isAnalyzing {
                 analyzingOverlay
@@ -85,18 +85,13 @@ struct CaptureView: View {
         }
         .overlay(alignment: .top) {
             if let bannerMessage = viewModel.bannerMessage {
-                Text(bannerMessage)
-                    .font(LaterrrTypography.caption(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-                    .padding(.horizontal, 16)
+                MicroText(bannerMessage, size: 9, kerning: 1.5)
+                    .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .glassEffect(
-                        Glass.regular.tint(LaterrrPalette.accentSoft.opacity(0.72)),
-                        in: Capsule()
-                    )
+                    .background(LaterrrPalette.canvas)
                     .overlay {
-                        Capsule()
-                            .strokeBorder(Color.white.opacity(0.76), lineWidth: 1)
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                     }
                     .padding(.top, 10)
                     .transition(.move(edge: .top).combined(with: .opacity))
@@ -112,36 +107,59 @@ struct CaptureView: View {
                 .contentShape(Rectangle())
                 .gesture(cameraZoomGesture)
         } else if isCameraLoading {
-            LaterrrLoadingView(
-                title: "loading camera",
-                message: "laterrr is warming up the camera so you can capture the place in one shot."
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            VStack(spacing: 20) {
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 62, weight: .semibold))
-                    .foregroundStyle(LaterrrPalette.accent)
+            viewfinderPlaceholder {
+                VStack(spacing: 18) {
+                    InkSpinner(size: 36, color: .white)
 
-                Text("Point at the storefront")
-                    .font(LaterrrTypography.display(36))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    Text("loading camera")
+                        .font(LaterrrTypography.display(30))
+                        .foregroundStyle(Color.white)
 
-                Text("Take a clean venue shot and laterrr checks the sign text against places nearby.")
-                    .font(LaterrrTypography.body(.title3))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 420)
-
-                if viewModel.cameraSession.authorizationStatus != .authorized {
-                    Text("Camera permission is off right now. You can still import a photo from your library below.")
-                        .font(LaterrrTypography.body())
-                        .foregroundStyle(LaterrrPalette.textSecondary)
+                    Text("laterrr is warming up the camera so you can capture the place in one shot.")
+                        .font(LaterrrTypography.body(.subheadline))
+                        .foregroundStyle(Color.white.opacity(0.6))
                         .multilineTextAlignment(.center)
-                        .frame(maxWidth: 420)
+                        .frame(maxWidth: 320)
                 }
             }
-            .padding(24)
+        } else {
+            viewfinderPlaceholder {
+                VStack(spacing: 16) {
+                    MicroText("Viewfinder", color: Color.white.opacity(0.6))
+
+                    Text("Point at the storefront.")
+                        .font(LaterrrTypography.display(36))
+                        .foregroundStyle(Color.white)
+                        .multilineTextAlignment(.center)
+
+                    Text("Take a clean venue shot and laterrr checks the sign text against places nearby.")
+                        .font(LaterrrTypography.body(.subheadline))
+                        .foregroundStyle(Color.white.opacity(0.6))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: 420)
+
+                    if viewModel.cameraSession.authorizationStatus != .authorized {
+                        Text("Camera permission is off right now. You can still import a photo from your library below.")
+                            .font(LaterrrTypography.body(.footnote))
+                            .foregroundStyle(Color.white.opacity(0.6))
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: 420)
+                    }
+                }
+                .padding(24)
+            }
+        }
+    }
+
+    private func viewfinderPlaceholder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+
+            CrosshatchPattern(lineColor: .white, lineOpacity: 0.12)
+                .ignoresSafeArea()
+
+            content()
         }
     }
 
@@ -154,18 +172,13 @@ struct CaptureView: View {
     private var captureControls: some View {
         HStack(spacing: 18) {
             PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-                    .frame(width: 56, height: 56)
-                    .glassEffect(
-                        Glass.regular.tint(Color.white.opacity(0.68)),
-                        in: Circle()
-                    )
+                MicroText("Photos", size: 9, kerning: 1.5)
+                    .frame(width: 64, height: 40)
                     .overlay {
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                     }
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
@@ -178,17 +191,17 @@ struct CaptureView: View {
             } label: {
                 ZStack {
                     Circle()
-                        .strokeBorder(Color.white.opacity(0.92), lineWidth: 6)
-                        .frame(width: 82, height: 82)
+                        .strokeBorder(LaterrrPalette.ink, lineWidth: 1.5)
+                        .frame(width: 66, height: 66)
 
                     Circle()
-                        .fill(Color.white.opacity(0.98))
-                        .frame(width: 64, height: 64)
+                        .fill(LaterrrPalette.ink)
+                        .frame(width: 50, height: 50)
                 }
-                .shadow(color: Color.black.opacity(0.16), radius: 18, y: 10)
             }
             .buttonStyle(.plain)
             .disabled(viewModel.cameraSession.authorizationStatus != .authorized)
+            .accessibilityLabel("Capture photo")
 
             Spacer()
 
@@ -198,51 +211,42 @@ struct CaptureView: View {
                 )
                 isTikTokPasteSheetPresented = true
             } label: {
-                Image(systemName: "link")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-                    .frame(width: 56, height: 56)
-                    .glassEffect(
-                        Glass.regular.tint(Color.white.opacity(0.68)),
-                        in: Circle()
-                    )
+                MicroText("Link", size: 9, kerning: 1.5)
+                    .frame(width: 64, height: 40)
                     .overlay {
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                     }
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
-        .glassEffect(
-            Glass.regular.tint(Color.white.opacity(0.34)),
-            in: Capsule(style: .continuous)
-        )
+        .background(LaterrrPalette.canvas)
         .overlay {
-            Capsule(style: .continuous)
-                .strokeBorder(Color.white.opacity(0.62), lineWidth: 1)
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
     }
 
     private var analyzingOverlay: some View {
-        Color.black.opacity(0.10)
+        LaterrrPalette.canvas.opacity(0.8)
             .ignoresSafeArea()
             .overlay {
-                GlassCard(alignment: .center) {
-                    ProgressView()
-                        .tint(LaterrrPalette.accent)
-                        .scaleEffect(1.2)
+                InkCard(alignment: .center) {
+                    InkSpinner(size: 36)
 
                     Text("Finding the best nearby match")
-                        .font(LaterrrTypography.headline())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
+                        .font(LaterrrTypography.display(24))
+                        .foregroundStyle(LaterrrPalette.ink)
+                        .multilineTextAlignment(.center)
 
                     Text(settingsStore.enableLookAroundVerification
                          ? "laterrr is reading the sign, checking nearby places, and verifying strong candidates with Look Around where available."
                          : "laterrr is reading the sign, checking nearby places, and trimming anything that looks too far away.")
-                        .font(LaterrrTypography.body())
-                        .foregroundStyle(LaterrrPalette.textSecondary)
+                        .font(LaterrrTypography.body(.subheadline))
+                        .foregroundStyle(LaterrrPalette.inkSecondary)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: 340)
@@ -319,32 +323,47 @@ private struct TikTokPasteImportSheet: View {
         ZStack {
             LaterrrBackground()
 
-            VStack(alignment: .leading, spacing: 18) {
-                Text("Import TikTok list")
-                    .font(LaterrrTypography.display(30))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+            VStack(alignment: .leading, spacing: 16) {
+                MicroText("TikTok import", color: LaterrrPalette.inkSecondary)
+
+                Text("Import a list.")
+                    .font(LaterrrTypography.display(32))
+                    .foregroundStyle(LaterrrPalette.ink)
 
                 Text("Paste a TikTok URL and laterrr will turn it into swipeable place cards.")
-                    .font(LaterrrTypography.body())
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                    .font(LaterrrTypography.body(.subheadline))
+                    .foregroundStyle(LaterrrPalette.inkSecondary)
 
-                TextField("https://vt.tiktok.com/...", text: $urlString, axis: .vertical)
+                VStack(spacing: 8) {
+                    TextField(
+                        "",
+                        text: $urlString,
+                        prompt: Text("https://vt.tiktok.com/…")
+                            .font(LaterrrTypography.accent(17))
+                            .foregroundStyle(LaterrrPalette.inkTertiary),
+                        axis: .vertical
+                    )
+                    .font(LaterrrTypography.body(.subheadline))
+                    .foregroundStyle(LaterrrPalette.ink)
+                    .tint(LaterrrPalette.ink)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
                     .focused($isURLFieldFocused)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.9), lineWidth: 1)
-                    }
+
+                    HairlineDivider()
+                }
 
                 if let errorMessage {
                     Text(errorMessage)
-                        .font(LaterrrTypography.body(.subheadline))
-                        .foregroundStyle(.red.opacity(0.88))
+                        .font(LaterrrTypography.headline(.footnote))
+                        .foregroundStyle(LaterrrPalette.ink)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
                 }
 
                 HStack(spacing: 12) {
@@ -354,10 +373,10 @@ private struct TikTokPasteImportSheet: View {
                         )
                         errorMessage = nil
                     } label: {
-                        Label("Paste", systemImage: "doc.on.clipboard")
+                        Text("Paste")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.inkOutline)
 
                     Button {
                         if let errorMessage = importAction(urlString) {
@@ -366,10 +385,10 @@ private struct TikTokPasteImportSheet: View {
                             dismiss()
                         }
                     } label: {
-                        Label("Import for later!", systemImage: "sparkles")
+                        Text("Import for later")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.inkPrimary)
                     .disabled(urlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -395,20 +414,16 @@ private struct CaptureReviewSheet: View {
                 VStack(alignment: .leading, spacing: 18) {
                     imageHero
 
-                    GlassCard {
-                        Text("Best match")
-                            .font(LaterrrTypography.display(28))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
+                    InkCard {
+                        MicroText("Best match", color: LaterrrPalette.inkSecondary)
 
                         Text(reviewState.analysis.narrative)
-                            .font(LaterrrTypography.body())
-                            .foregroundStyle(LaterrrPalette.textSecondary)
+                            .font(LaterrrTypography.body(.subheadline))
+                            .foregroundStyle(LaterrrPalette.inkSecondary)
 
                         if !reviewState.analysis.extractedText.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Read from the photo")
-                                    .font(LaterrrTypography.caption(.subheadline))
-                                    .foregroundStyle(LaterrrPalette.textSecondary)
+                                MicroText("Read from the photo", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
 
                                 FlowLayout(reviewState.analysis.extractedText)
                             }
@@ -423,36 +438,34 @@ private struct CaptureReviewSheet: View {
                         )
                     } else {
                         ForEach(reviewState.analysis.suggestions) { suggestion in
-                            GlassCard {
+                            InkCard {
                                 VStack(alignment: .leading, spacing: 14) {
                                     HStack(alignment: .top) {
-                                        VStack(alignment: .leading, spacing: 8) {
+                                        VStack(alignment: .leading, spacing: 6) {
                                             Text(suggestion.name)
                                                 .font(LaterrrTypography.display(26))
-                                                .foregroundStyle(LaterrrPalette.textPrimary)
+                                                .foregroundStyle(LaterrrPalette.ink)
 
                                             Text(suggestion.shortAddress)
-                                                .font(LaterrrTypography.body())
-                                                .foregroundStyle(LaterrrPalette.textSecondary)
+                                                .font(LaterrrTypography.body(.subheadline))
+                                                .foregroundStyle(LaterrrPalette.inkSecondary)
                                         }
 
                                         Spacer()
 
-                                        ConfidencePill(score: suggestion.score)
+                                        ConfidencePill(score: suggestion.score, caption: "SIGN MATCH")
                                     }
 
-                                    HStack(spacing: 10) {
-                                        Label(suggestion.category, systemImage: "fork.knife")
-                                        if suggestion.distanceMeters > 0 {
-                                            Label("\(Int(suggestion.distanceMeters.rounded())) m", systemImage: "figure.walk")
-                                        }
-                                    }
-                                    .font(LaterrrTypography.caption())
-                                    .foregroundStyle(LaterrrPalette.textSecondary)
+                                    MicroText(
+                                        suggestionMetadata(for: suggestion),
+                                        size: 9,
+                                        kerning: 1.5,
+                                        color: LaterrrPalette.inkSecondary
+                                    )
 
                                     Text(suggestion.rationale)
-                                        .font(LaterrrTypography.body(.subheadline))
-                                        .foregroundStyle(LaterrrPalette.textSecondary)
+                                        .font(LaterrrTypography.accent(17))
+                                        .foregroundStyle(LaterrrPalette.inkSecondary)
 
                                     LookAroundSection(preview: suggestion.lookAroundPreview)
 
@@ -460,18 +473,18 @@ private struct CaptureReviewSheet: View {
                                         Button {
                                             saveAction(suggestion)
                                         } label: {
-                                            Label("Save", systemImage: "bookmark.fill")
+                                            Text("Save")
                                                 .frame(maxWidth: .infinity)
                                         }
-                                        .buttonStyle(.glassProminent)
+                                        .buttonStyle(.inkPrimary)
 
                                         Button {
                                             openAction(suggestion)
                                         } label: {
-                                            Label("Apple Maps", systemImage: "map")
+                                            Text("Maps")
                                                 .frame(maxWidth: .infinity)
                                         }
-                                        .buttonStyle(.glass)
+                                        .buttonStyle(.inkOutline)
                                     }
                                 }
                             }
@@ -484,34 +497,43 @@ private struct CaptureReviewSheet: View {
         }
     }
 
-    private var imageHero: some View {
-        Image(uiImage: reviewState.photo.image)
-            .resizable()
-            .scaledToFill()
-            .frame(height: 240)
-            .frame(maxWidth: .infinity)
-            .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
-            .overlay(alignment: .bottomLeading) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(reviewState.analysis.analysisMethod)
-                        .font(LaterrrTypography.caption())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
+    private func suggestionMetadata(for suggestion: PlaceSuggestion) -> String {
+        var parts = [suggestion.category]
 
-                    Text("Pick the right venue if the photo frame caught more than one place.")
-                        .font(LaterrrTypography.headline())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                }
-                .padding(18)
-                .glassEffect(
-                    Glass.regular.tint(Color.white.opacity(0.70)),
-                    in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.78), lineWidth: 1)
-                }
-                .padding(16)
+        if suggestion.distanceMeters > 0 {
+            parts.append("\(Int(suggestion.distanceMeters.rounded())) m away")
+        }
+
+        return parts.joined(separator: " · ")
+    }
+
+    private var imageHero: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Image(uiImage: reviewState.photo.image)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 240)
+                .frame(maxWidth: .infinity)
+                .clipped()
+
+            VStack(alignment: .leading, spacing: 6) {
+                MicroText(reviewState.analysis.analysisMethod, size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
+
+                Text("Pick the right venue if the photo frame caught more than one place.")
+                    .font(LaterrrTypography.body(.footnote))
+                    .foregroundStyle(LaterrrPalette.ink)
             }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .top) {
+                HairlineDivider()
+            }
+        }
+        .background(LaterrrPalette.canvas)
+        .overlay {
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+        }
     }
 }
 
@@ -521,32 +543,14 @@ private struct LookAroundSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Label("Look Around", systemImage: "binoculars")
-                    .font(LaterrrTypography.caption(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                MicroText("Look Around", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
 
                 Spacer()
 
                 if let verificationScore = preview.verificationScore {
-                    Text("\(Int((verificationScore * 100).rounded()))%")
-                        .font(LaterrrTypography.caption())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(LaterrrPalette.accentSoft.opacity(0.72))
-                        )
+                    ConfidencePill(score: verificationScore, caption: "ALIGNED")
                 } else {
-                    Text(preview.availability.title)
-                        .font(LaterrrTypography.caption())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.white.opacity(0.52))
-                        )
+                    LaterrrTag(title: preview.availability.title)
                 }
             }
 
@@ -556,40 +560,30 @@ private struct LookAroundSection: View {
                     .scaledToFill()
                     .frame(height: 150)
                     .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            } else {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Color.white.opacity(0.34))
-                    .frame(height: 120)
+                    .clipped()
                     .overlay {
-                        VStack(spacing: 8) {
-                            Image(systemName: preview.availability == .disabled ? "binoculars.slash" : "eye.slash")
-                                .font(.system(size: 28, weight: .semibold))
-                                .foregroundStyle(LaterrrPalette.textSecondary)
-
-                            Text(preview.availability == .disabled ? "Look Around off" : "Not available here")
-                                .font(LaterrrTypography.headline())
-                                .foregroundStyle(LaterrrPalette.textPrimary)
-                        }
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                     }
+            } else {
+                CrosshatchPlaceholder(
+                    caption: preview.availability == .disabled ? "Look Around off" : "Not available here"
+                )
+                .frame(height: 120)
             }
 
             Text(preview.summary)
                 .font(LaterrrTypography.body(.footnote))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .foregroundStyle(LaterrrPalette.inkSecondary)
 
             if !preview.matchedTokens.isEmpty {
                 FlowLayout(preview.matchedTokens)
             }
         }
         .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color.white.opacity(0.36))
-        )
         .overlay {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.72), lineWidth: 1)
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
     }
 }
@@ -605,26 +599,14 @@ private struct FlowLayout: View {
         ViewThatFits(in: .vertical) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 8)], alignment: .leading, spacing: 8) {
                 ForEach(items, id: \.self) { item in
-                    Text(item)
-                        .font(LaterrrTypography.caption(.footnote))
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .glassEffect(
-                            Glass.regular.tint(Color.white.opacity(0.64)),
-                            in: Capsule()
-                        )
-                        .overlay {
-                            Capsule()
-                                .strokeBorder(Color.white.opacity(0.78), lineWidth: 1)
-                        }
+                    LaterrrTag(title: item)
                 }
             }
 
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(items, id: \.self) { item in
                     Text(item)
-                        .foregroundStyle(LaterrrPalette.textPrimary)
+                        .foregroundStyle(LaterrrPalette.ink)
                 }
             }
         }

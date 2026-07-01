@@ -39,18 +39,23 @@ struct TikTokImportReviewView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
+            MicroText("TikTok import", color: LaterrrPalette.inkSecondary)
+
             Text("\(reviewState.remainingCount) places left to review")
-                .font(LaterrrTypography.display(24))
-                .foregroundStyle(LaterrrPalette.textPrimary)
+                .font(LaterrrTypography.display(26))
+                .foregroundStyle(LaterrrPalette.ink)
 
             Text(reviewState.deck.title)
-                .font(LaterrrTypography.headline())
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .font(LaterrrTypography.accent(17))
+                .foregroundStyle(LaterrrPalette.inkSecondary)
                 .lineLimit(2)
 
-            Text("Swipe left to skip, or swipe right to save into Places.")
-                .font(LaterrrTypography.body(.subheadline))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+            MicroText(
+                "Swipe left to skip · swipe right to save",
+                size: 9,
+                kerning: 1.5,
+                color: LaterrrPalette.inkTertiary
+            )
         }
     }
 
@@ -71,36 +76,32 @@ struct TikTokImportReviewView: View {
 
                 Text(venue.name)
                     .font(LaterrrTypography.display(28))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    .foregroundStyle(LaterrrPalette.ink)
                     .lineLimit(2)
 
                 Text(venue.appleMapsDescription)
                     .font(LaterrrTypography.headline(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    .foregroundStyle(LaterrrPalette.ink)
                     .lineLimit(2)
 
                 Text(venue.fullAddress)
                     .font(LaterrrTypography.body(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                    .foregroundStyle(LaterrrPalette.inkSecondary)
                     .lineLimit(2)
 
                 Text("Imported from TikTok as “\(venue.sourceLine)” and matched in Apple Maps.")
-                    .font(LaterrrTypography.caption(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                    .font(LaterrrTypography.accent(16))
+                    .foregroundStyle(LaterrrPalette.inkSecondary)
                     .lineLimit(3)
             }
             .padding(18)
         }
         .frame(width: width, height: height, alignment: .top)
-        .background {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(Color.white.opacity(0.86))
-        }
+        .background(LaterrrPalette.canvas)
         .overlay {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.94), lineWidth: 1)
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
-        .shadow(color: LaterrrPalette.shadow, radius: 24, y: 14)
         .offset(x: dragOffset.width, y: min(max(dragOffset.height, -20), 20))
         .rotationEffect(.degrees(Double(dragOffset.width / 42)))
         .scaleEffect(1 - min(abs(dragOffset.width) / 1800, 0.04))
@@ -114,33 +115,18 @@ struct TikTokImportReviewView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
+                    .frame(height: height)
+                    .frame(maxWidth: .infinity)
+                    .clipped()
             } else {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .fill(LaterrrPalette.accentSoft.opacity(0.38))
-
-                    VStack(spacing: 10) {
-                        Image(systemName: "binoculars")
-                            .font(.system(size: 30, weight: .semibold))
-                            .foregroundStyle(LaterrrPalette.textSecondary)
-
-                        Text("Look Around not available")
-                            .font(LaterrrTypography.headline())
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-                    }
-                }
+                CrosshatchPlaceholder(caption: "Look Around not available")
+                    .frame(height: height)
+                    .frame(maxWidth: .infinity)
             }
         }
-        .frame(height: height)
-        .frame(maxWidth: .infinity)
-        .clipShape(
-            UnevenRoundedRectangle(
-                topLeadingRadius: 34,
-                bottomLeadingRadius: 24,
-                bottomTrailingRadius: 24,
-                topTrailingRadius: 34
-            )
-        )
+        .overlay(alignment: .bottom) {
+            HairlineDivider()
+        }
     }
 
     private var footer: some View {
@@ -148,18 +134,18 @@ struct TikTokImportReviewView: View {
             Button {
                 skipAction()
             } label: {
-                Label("Skip", systemImage: "xmark")
+                Text("Skip")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.glass)
+            .buttonStyle(.inkOutline)
 
             Button {
                 saveAction()
             } label: {
-                Label("Save", systemImage: "bookmark.fill")
+                Text("Save")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.glassProminent)
+            .buttonStyle(.inkPrimary)
         }
     }
 

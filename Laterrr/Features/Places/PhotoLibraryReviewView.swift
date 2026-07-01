@@ -65,26 +65,30 @@ struct PhotoLibraryReviewView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
+            MicroText("Photos review", color: LaterrrPalette.inkSecondary)
+
             Text(controller.progressTitle)
-                .font(LaterrrTypography.display(24))
-                .foregroundStyle(LaterrrPalette.textPrimary)
+                .font(LaterrrTypography.display(26))
+                .foregroundStyle(LaterrrPalette.ink)
 
             if let dayWindow = controller.deck?.dayWindow {
-                Text("Recent Photos from the last \(dayWindow) days")
-                    .font(LaterrrTypography.headline())
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                MicroText(
+                    "Recent photos — last \(dayWindow) days",
+                    size: 9,
+                    kerning: 1.5,
+                    color: LaterrrPalette.inkSecondary
+                )
             }
 
-            ProgressView(value: controller.progressFraction)
-                .tint(LaterrrPalette.accent)
+            InkProgressBar(value: controller.progressFraction)
 
             Text(controller.progressSummary)
-                .font(LaterrrTypography.body(.subheadline))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .font(LaterrrTypography.body(.footnote))
+                .foregroundStyle(LaterrrPalette.inkSecondary)
 
             Text("Save the selected place, skip it, or scroll the nearby options if laterrr picked the wrong one.")
-                .font(LaterrrTypography.caption(.subheadline))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .font(LaterrrTypography.body(.footnote))
+                .foregroundStyle(LaterrrPalette.inkTertiary)
         }
     }
 
@@ -125,12 +129,12 @@ struct PhotoLibraryReviewView: View {
 
                     Text(selectedSuggestion.name)
                         .font(LaterrrTypography.display(28))
-                        .foregroundStyle(LaterrrPalette.textPrimary)
+                        .foregroundStyle(LaterrrPalette.ink)
                         .lineLimit(2)
 
                     Text(selectedSuggestion.shortAddress)
-                        .font(LaterrrTypography.headline(.subheadline))
-                        .foregroundStyle(LaterrrPalette.textSecondary)
+                        .font(LaterrrTypography.body(.subheadline))
+                        .foregroundStyle(LaterrrPalette.inkSecondary)
                         .lineLimit(2)
 
                     reasonSection(evidenceRows: evidenceRows)
@@ -142,8 +146,8 @@ struct PhotoLibraryReviewView: View {
 
                     if candidate.analysis.narrative != selectedSuggestion.rationale {
                         Text(candidate.analysis.narrative)
-                            .font(LaterrrTypography.body(.subheadline))
-                            .foregroundStyle(LaterrrPalette.textSecondary)
+                            .font(LaterrrTypography.body(.footnote))
+                            .foregroundStyle(LaterrrPalette.inkSecondary)
                     }
 
                     nearbyOptionsSection(
@@ -156,25 +160,25 @@ struct PhotoLibraryReviewView: View {
             .scrollIndicators(.visible)
         }
         .frame(width: width, height: height, alignment: .top)
-        .background {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(Color.white.opacity(0.86))
-        }
+        .background(LaterrrPalette.canvas)
         .overlay {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.94), lineWidth: 1)
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
-        .shadow(color: LaterrrPalette.shadow, radius: 24, y: 14)
     }
 
     private func waitingCard(width: CGFloat, height: CGFloat) -> some View {
-        GlassCard(alignment: .center) {
-            LaterrrBrandStar(size: 110, isSpinning: controller.isScanning)
+        InkCard(alignment: .center) {
+            if controller.isScanning {
+                InkSpinner(size: 36)
+            } else {
+                CrosshatchPlaceholder()
+                    .frame(width: 72, height: 72)
+            }
 
             Text(controller.isScanning ? "Still scanning your photos" : "No more places left")
                 .font(LaterrrTypography.display(26))
-                .foregroundStyle(LaterrrPalette.textPrimary)
+                .foregroundStyle(LaterrrPalette.ink)
                 .multilineTextAlignment(.center)
 
             Text(
@@ -182,8 +186,8 @@ struct PhotoLibraryReviewView: View {
                     ? "laterrr already opened the review deck and will drop the next place photo here as soon as it finds one."
                     : "The current review queue is empty."
             )
-            .font(LaterrrTypography.body())
-            .foregroundStyle(LaterrrPalette.textSecondary)
+            .font(LaterrrTypography.body(.subheadline))
+            .foregroundStyle(LaterrrPalette.inkSecondary)
             .multilineTextAlignment(.center)
         }
         .frame(width: width, height: height)
@@ -194,32 +198,34 @@ struct PhotoLibraryReviewView: View {
             Button {
                 skipAction()
             } label: {
-                Label("Skip", systemImage: "xmark")
+                Text("Skip")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.glass)
+            .buttonStyle(.inkOutline)
             .disabled(controller.currentCandidate == nil)
 
             Button {
                 saveAction()
             } label: {
-                Label("Save", systemImage: "bookmark.fill")
+                Text("Save")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.glassProminent)
+            .buttonStyle(.inkPrimary)
             .disabled(controller.currentSuggestion == nil)
         }
     }
 
     @ViewBuilder
     private func reasonSection(evidenceRows: [EvidenceReasonItem]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Why laterrr picked this")
-                .font(LaterrrTypography.caption(.subheadline))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+        VStack(alignment: .leading, spacing: 0) {
+            MicroText("Why laterrr picked this", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
+                .padding(.bottom, 8)
 
-            ForEach(evidenceRows) { row in
-                EvidenceReasonRow(row: row)
+            HairlineDivider()
+
+            ForEach(Array(evidenceRows.enumerated()), id: \.element.id) { index, row in
+                EvidenceReasonRow(row: row, index: index)
+                HairlineDivider(color: LaterrrPalette.ink.opacity(0.2))
             }
         }
     }
@@ -231,16 +237,14 @@ struct PhotoLibraryReviewView: View {
     ) -> some View {
         if !highlightedLines.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Highlighted in the photo")
-                    .font(LaterrrTypography.caption(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                MicroText("Highlighted in the photo", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
 
                 TokenChipFlow(items: highlightedLines)
             }
         } else if !extractedText.isEmpty {
             Text("Read from photo: \(extractedText.prefix(4).joined(separator: ", "))")
-                .font(LaterrrTypography.caption(.subheadline))
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                .font(LaterrrTypography.accent(16))
+                .foregroundStyle(LaterrrPalette.inkSecondary)
                 .lineLimit(3)
         }
     }
@@ -252,47 +256,47 @@ struct PhotoLibraryReviewView: View {
     ) -> some View {
         if !suggestions.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Nearby options")
-                    .font(LaterrrTypography.caption(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                MicroText("Nearby options", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
 
                 ForEach(Array(suggestions.enumerated()), id: \.element.id) { index, suggestion in
+                    let isSelected = selectedSuggestion.id == suggestion.id
+
                     Button {
                         controller.selectSuggestion(index: index)
                     } label: {
                         HStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(suggestion.name)
-                                    .font(LaterrrTypography.headline())
-                                    .foregroundStyle(LaterrrPalette.textPrimary)
+                                    .font(LaterrrTypography.display(19))
+                                    .foregroundStyle(isSelected ? LaterrrPalette.canvas : LaterrrPalette.ink)
                                     .lineLimit(1)
 
                                 Text(suggestion.shortAddress)
-                                    .font(LaterrrTypography.caption(.subheadline))
-                                    .foregroundStyle(LaterrrPalette.textSecondary)
+                                    .font(LaterrrTypography.body(.footnote))
+                                    .foregroundStyle(
+                                        isSelected
+                                            ? LaterrrPalette.canvas.opacity(0.7)
+                                            : LaterrrPalette.inkSecondary
+                                    )
                                     .lineLimit(2)
                             }
 
                             Spacer()
 
-                            if selectedSuggestion.id == suggestion.id {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 22, weight: .semibold))
-                                    .foregroundStyle(LaterrrPalette.accent)
+                            if isSelected {
+                                MicroText("Selected", size: 9, kerning: 1.5, color: LaterrrPalette.canvas)
                             } else {
                                 ConfidencePill(score: suggestion.score)
                             }
                         }
                         .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .fill(Color.white.opacity(selectedSuggestion.id == suggestion.id ? 0.76 : 0.50))
-                        )
+                        .background(isSelected ? LaterrrPalette.ink : LaterrrPalette.canvas)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                         }
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
@@ -423,39 +427,23 @@ private struct EvidenceReasonItem: Identifiable {
 
 private struct EvidenceReasonRow: View {
     let row: EvidenceReasonItem
+    var index: Int = 0
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: row.icon)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(LaterrrPalette.accent)
-                .frame(width: 24, height: 24)
-                .background(
-                    Circle()
-                        .fill(LaterrrPalette.accentSoft.opacity(0.28))
-                )
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            MicroText(String(format: "%02d", index + 1), size: 9, kerning: 1.5, color: LaterrrPalette.inkTertiary)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(row.title)
-                    .font(LaterrrTypography.headline(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                MicroText(row.title, size: 9, kerning: 1.5)
 
                 Text(row.body)
                     .font(LaterrrTypography.body(.footnote))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
+                    .foregroundStyle(LaterrrPalette.inkSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(12)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.46))
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.78), lineWidth: 1)
-        }
     }
 }
 
@@ -469,19 +457,7 @@ private struct TokenChipFlow: View {
             spacing: 8
         ) {
             ForEach(items, id: \.self) { item in
-                Text(item)
-                    .font(LaterrrTypography.caption(.footnote))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .glassEffect(
-                        Glass.regular.tint(Color.white.opacity(0.64)),
-                        in: Capsule()
-                    )
-                    .overlay {
-                        Capsule()
-                            .strokeBorder(Color.white.opacity(0.78), lineWidth: 1)
-                    }
+                LaterrrTag(title: item)
             }
         }
     }
@@ -498,8 +474,7 @@ private struct PhotoEvidenceHero: View {
         let image = UIImage(data: photoData)
 
         ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(Color.white.opacity(0.18))
+            CrosshatchPattern()
 
             if let image {
                 EvidenceImageCanvas(
@@ -508,70 +483,60 @@ private struct PhotoEvidenceHero: View {
                 )
                 .padding(12)
             } else {
-                ContentUnavailableView(
-                    "Preview unavailable",
-                    systemImage: "photo",
-                    description: Text("laterrr could not load the full photo preview.")
-                )
-                .foregroundStyle(LaterrrPalette.textSecondary)
+                VStack(spacing: 8) {
+                    CrosshatchPlaceholder()
+                        .frame(width: 56, height: 56)
+
+                    Text("Preview unavailable")
+                        .font(LaterrrTypography.body(.footnote))
+                        .foregroundStyle(LaterrrPalette.inkSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
             HStack(spacing: 10) {
                 if isLoading {
-                    ProgressView()
-                        .tint(LaterrrPalette.textPrimary)
-                } else {
-                    Image(systemName: highlightedObservations.isEmpty ? "photo" : "text.viewfinder")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(LaterrrPalette.textPrimary)
+                    InkSpinner(size: 16)
                 }
 
                 Text(statusText)
-                    .font(LaterrrTypography.caption(.footnote))
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+                    .font(LaterrrTypography.body(.caption))
+                    .foregroundStyle(LaterrrPalette.ink)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .glassEffect(
-                Glass.regular.tint(Color.white.opacity(0.70)),
-                in: Capsule(style: .continuous)
-            )
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(LaterrrPalette.canvas)
             .overlay {
-                Capsule(style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
             }
-            .padding(14)
+            .padding(12)
 
             VStack {
                 HStack {
                     Spacer()
 
-                    Label("Zoom", systemImage: "arrow.up.left.and.arrow.down.right")
-                        .font(LaterrrTypography.caption(.footnote))
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .glassEffect(
-                            Glass.regular.tint(Color.white.opacity(0.68)),
-                            in: Capsule(style: .continuous)
-                        )
+                    MicroText("Zoom", size: 9, kerning: 1.5)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(LaterrrPalette.canvas)
                         .overlay {
-                            Capsule(style: .continuous)
-                                .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                         }
                 }
 
                 Spacer()
             }
-            .padding(14)
+            .padding(12)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .background(LaterrrPalette.canvas)
         .overlay {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.86), lineWidth: 1)
+            Rectangle()
+                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
         }
-        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .contentShape(Rectangle())
         .onTapGesture(perform: tapAction)
     }
 }
@@ -593,18 +558,16 @@ private struct EvidenceImageCanvas: View {
                 ForEach(observations) { observation in
                     let rect = highlightRect(for: observation.boundingBox, in: fitRect)
 
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(LaterrrPalette.accentSoft.opacity(0.16))
+                    Rectangle()
+                        .fill(Color.white.opacity(0.12))
                         .overlay {
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .strokeBorder(
-                                    LinearGradient(
-                                        colors: [Color.white.opacity(0.96), LaterrrPalette.accent.opacity(0.88)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 2
-                                )
+                            Rectangle()
+                                .strokeBorder(Color.white, lineWidth: 2)
+                        }
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(Color.black.opacity(0.6), lineWidth: 1)
+                                .padding(2)
                         }
                         .frame(width: max(rect.width, 34), height: max(rect.height, 22))
                         .position(x: rect.midX, y: rect.midY)
@@ -661,7 +624,7 @@ private struct ZoomableEvidenceViewer: View {
 
                         Text(subtitle)
                             .font(LaterrrTypography.body(.footnote))
-                            .foregroundStyle(Color.white.opacity(0.78))
+                            .foregroundStyle(Color.white.opacity(0.6))
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
@@ -670,16 +633,17 @@ private struct ZoomableEvidenceViewer: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Color.white)
-                            .frame(width: 44, height: 44)
-                            .background(
-                                Circle()
-                                    .fill(Color.white.opacity(0.14))
-                            )
+                        MicroText("Close", size: 9, kerning: 1.5, color: .white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .overlay {
+                                Rectangle()
+                                    .strokeBorder(Color.white, lineWidth: 1)
+                            }
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Close")
                 }
 
                 ZoomableEvidenceCanvas(
@@ -687,9 +651,12 @@ private struct ZoomableEvidenceViewer: View {
                     observations: Array(highlightedObservations.prefix(8))
                 )
 
-                Text("Pinch to zoom and drag to inspect the storefront text.")
-                    .font(LaterrrTypography.caption(.footnote))
-                    .foregroundStyle(Color.white.opacity(0.74))
+                MicroText(
+                    "Pinch to zoom · drag to inspect",
+                    size: 9,
+                    kerning: 1.5,
+                    color: Color.white.opacity(0.6)
+                )
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
@@ -710,8 +677,7 @@ private struct ZoomableEvidenceCanvas: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                RoundedRectangle(cornerRadius: 30, style: .continuous)
-                    .fill(Color.white.opacity(0.05))
+                CrosshatchPattern(lineColor: .white, lineOpacity: 0.1)
 
                 if let image {
                     EvidenceImageCanvas(image: image, observations: observations)
@@ -721,19 +687,16 @@ private struct ZoomableEvidenceCanvas: View {
                         .simultaneousGesture(magnificationGesture)
                         .onTapGesture(count: 2, perform: toggleZoom)
                 } else {
-                    ContentUnavailableView(
-                        "Preview unavailable",
-                        systemImage: "photo",
-                        description: Text("laterrr could not load the zoomable photo.")
-                    )
-                    .foregroundStyle(Color.white.opacity(0.76))
+                    Text("Preview unavailable")
+                        .font(LaterrrTypography.body(.footnote))
+                        .foregroundStyle(Color.white.opacity(0.6))
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .clipped()
             .overlay {
-                RoundedRectangle(cornerRadius: 30, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                Rectangle()
+                    .strokeBorder(Color.white, lineWidth: 1)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

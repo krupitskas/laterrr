@@ -15,34 +15,12 @@ struct PlacesListView: View {
         ZStack {
             LaterrrBackground()
 
-            content
-        }
-        .navigationTitle("Places")
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 1) {
-                    Text("Places")
-                        .font(LaterrrTypography.headline())
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-
-                    Text("\(savedPlaces.count) saved")
-                        .font(LaterrrTypography.caption(.caption2))
-                        .foregroundStyle(LaterrrPalette.textSecondary)
-                }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    isPhotoReviewPickerPresented = true
-                } label: {
-                    Image(systemName: "photo.stack")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(LaterrrPalette.textPrimary)
-                }
-                .disabled(photoReviewController.isPreparing)
-                .accessibilityLabel("Review recent photos")
+            VStack(spacing: 0) {
+                header
+                content
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
         .confirmationDialog(
             "Review your recent photos",
             isPresented: $isPhotoReviewPickerPresented,
@@ -90,22 +68,22 @@ struct PlacesListView: View {
         }
         .overlay {
             if photoReviewController.isPreparing && !photoReviewController.isPresentingReview {
-                Color.black.opacity(0.10)
+                LaterrrPalette.canvas.opacity(0.8)
                     .ignoresSafeArea()
                     .overlay {
-                        GlassCard(alignment: .center) {
-                            LaterrrBrandStar(size: 110, isSpinning: true)
+                        InkCard(alignment: .center) {
+                            InkSpinner(size: 36)
 
                             Text("Reviewing recent place photos")
-                                .font(LaterrrTypography.display(28))
-                                .foregroundStyle(LaterrrPalette.textPrimary)
+                                .font(LaterrrTypography.display(26))
+                                .foregroundStyle(LaterrrPalette.ink)
+                                .multilineTextAlignment(.center)
 
-                            ProgressView(value: photoReviewController.progressFraction)
-                                .tint(LaterrrPalette.accent)
+                            InkProgressBar(value: photoReviewController.progressFraction)
 
                             Text(photoReviewController.progressSummary)
-                                .font(LaterrrTypography.body())
-                                .foregroundStyle(LaterrrPalette.textSecondary)
+                                .font(LaterrrTypography.body(.subheadline))
+                                .foregroundStyle(LaterrrPalette.inkSecondary)
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: 340)
@@ -128,6 +106,43 @@ struct PlacesListView: View {
         }
     }
 
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center) {
+                MicroText("Saved places — \(savedPlaces.count)", color: LaterrrPalette.inkSecondary)
+
+                Spacer()
+
+                Button {
+                    isPhotoReviewPickerPresented = true
+                } label: {
+                    MicroText("Review photos", size: 9, kerning: 1.5)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(photoReviewController.isPreparing)
+                .accessibilityLabel("Review recent photos")
+            }
+
+            Text("Index.")
+                .font(LaterrrTypography.display(44))
+                .foregroundStyle(LaterrrPalette.ink)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) {
+            HairlineDivider()
+        }
+    }
+
     @ViewBuilder
     private var content: some View {
         if savedPlaces.isEmpty {
@@ -142,8 +157,8 @@ struct PlacesListView: View {
             .scrollIndicators(.hidden)
         } else {
             List {
-                ForEach(savedPlaces) { place in
-                    SavedPlaceRow(place: place)
+                ForEach(Array(savedPlaces.enumerated()), id: \.element.id) { index, place in
+                    SavedPlaceRow(place: place, index: index)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -157,7 +172,7 @@ struct PlacesListView: View {
                             }
                         }
                         .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
                         .listRowBackground(Color.clear)
                 }
             }
@@ -183,7 +198,6 @@ struct PlacesListView: View {
 struct PlacesSearchView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var searchText = ""
-    @State private var isSearchPresented = true
     @FocusState private var isSearchFocused: Bool
 
     let openPlace: (SavedPlace) -> Void
@@ -192,55 +206,119 @@ struct PlacesSearchView: View {
         ZStack {
             LaterrrBackground()
 
-            if savedPlaces.isEmpty {
-                ScrollView {
-                    EmptyStateView(
-                        title: "No saved places yet",
-                        message: "Save a few cafes or restaurants first, then search by name or address here.",
-                        systemImage: "magnifyingglass"
-                    )
-                    .padding(20)
-                }
-                .scrollIndicators(.hidden)
-            } else if filteredPlaces.isEmpty, !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                ContentUnavailableView.search(text: searchText)
-                    .foregroundStyle(LaterrrPalette.textSecondary)
-            } else {
-                List {
-                    ForEach(filteredPlaces) { place in
-                        SavedPlaceRow(place: place)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                openPlace(place)
-                            }
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                            .listRowBackground(Color.clear)
+            VStack(spacing: 0) {
+                header
+
+                if savedPlaces.isEmpty {
+                    ScrollView {
+                        EmptyStateView(
+                            title: "No saved places yet",
+                            message: "Save a few cafes or restaurants first, then search by name or address here.",
+                            systemImage: "magnifyingglass"
+                        )
+                        .padding(20)
                     }
+                    .scrollIndicators(.hidden)
+                } else if filteredPlaces.isEmpty, !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Nothing matches.")
+                            .font(LaterrrTypography.display(30))
+                            .foregroundStyle(LaterrrPalette.ink)
+
+                        Text("No saved place matches “\(searchText)”. Try another name or address.")
+                            .font(LaterrrTypography.body(.subheadline))
+                            .foregroundStyle(LaterrrPalette.inkSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+
+                    Spacer()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            isSearchFocused = false
+                        }
+                } else {
+                    List {
+                        ForEach(Array(filteredPlaces.enumerated()), id: \.element.id) { index, place in
+                            SavedPlaceRow(place: place, index: index)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    openPlace(place)
+                                }
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                                .listRowBackground(Color.clear)
+                        }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
+                    .scrollDismissesKeyboard(.immediately)
+                    .simultaneousGesture(
+                        TapGesture().onEnded {
+                            isSearchFocused = false
+                        }
+                    )
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .scrollIndicators(.hidden)
             }
         }
-        .navigationTitle("Search")
-        .searchable(
-            text: $searchText,
-            isPresented: $isSearchPresented,
-            placement: .automatic,
-            prompt: "Search name or address"
-        )
-        .searchFocused($isSearchFocused)
-        .searchSuggestions {
-            ForEach(Array(filteredPlaces.prefix(6))) { place in
-                Text(place.name)
-                    .searchCompletion(place.name)
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
         .onAppear {
-            isSearchPresented = true
             isSearchFocused = true
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            MicroText("Search — \(savedPlaces.count) places", color: LaterrrPalette.inkSecondary)
+
+            Text("Find.")
+                .font(LaterrrTypography.display(44))
+                .foregroundStyle(LaterrrPalette.ink)
+
+            searchField
+                .padding(.top, 8)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) {
+            HairlineDivider()
+        }
+    }
+
+    private var searchField: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                TextField(
+                    "",
+                    text: $searchText,
+                    prompt: Text("Search name or address…")
+                        .font(LaterrrTypography.accent(19))
+                        .foregroundStyle(LaterrrPalette.inkTertiary)
+                )
+                .font(LaterrrTypography.accent(19))
+                .foregroundStyle(LaterrrPalette.ink)
+                .tint(LaterrrPalette.ink)
+                .autocorrectionDisabled()
+                .focused($isSearchFocused)
+                .submitLabel(.search)
+
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                    } label: {
+                        MicroText("Clear", size: 9, kerning: 1.5, color: LaterrrPalette.inkSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Clear search")
+                }
+            }
+
+            HairlineDivider()
         }
     }
 
@@ -261,51 +339,59 @@ struct PlacesSearchView: View {
 
 struct SavedPlaceRow: View {
     let place: SavedPlace
+    var index: Int = 0
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
-            preview
+            MicroText(String(format: "%02d", index + 1), color: LaterrrPalette.inkTertiary)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(place.name)
-                    .font(LaterrrTypography.headline())
-                    .foregroundStyle(LaterrrPalette.textPrimary)
+            SavedPlacePreviewImage(
+                place: place,
+                width: 56,
+                height: 56,
+                cornerRadius: 0
+            )
+            .overlay {
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(displayName)
+                    .font(LaterrrTypography.display(23))
+                    .foregroundStyle(LaterrrPalette.ink)
                     .lineLimit(2)
 
-                Text(place.shortAddress)
-                    .font(LaterrrTypography.body(.subheadline))
-                    .foregroundStyle(LaterrrPalette.textSecondary)
-                    .lineLimit(2)
-
-                HStack(spacing: 8) {
-                    LaterrrTag(title: place.source.title)
-                    LaterrrTag(title: place.createdAt.formatted(date: .abbreviated, time: .omitted))
-                }
+                MicroText(
+                    metadataLine,
+                    size: 9,
+                    kerning: 1.5,
+                    color: LaterrrPalette.inkSecondary
+                )
+                .lineLimit(1)
             }
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .frame(maxWidth: .infinity, minHeight: 106, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(Color.white.opacity(0.80))
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.92), lineWidth: 1)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) {
+            HairlineDivider()
         }
-        .shadow(color: LaterrrPalette.shadow.opacity(0.72), radius: 10, y: 5)
     }
 
-    @ViewBuilder
-    private var preview: some View {
-        SavedPlacePreviewImage(
-            place: place,
-            width: 78,
-            height: 78,
-            cornerRadius: 22
-        )
+    private var displayName: String {
+        let trimmedName = place.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedName.hasSuffix(".") ? trimmedName : trimmedName + "."
+    }
+
+    private var metadataLine: String {
+        var parts = [place.source.title, place.createdAt.formatted(date: .abbreviated, time: .omitted)]
+
+        if !place.shortAddress.isEmpty {
+            parts.append(place.shortAddress)
+        }
+
+        return parts.joined(separator: " · ")
     }
 }

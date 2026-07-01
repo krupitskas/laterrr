@@ -15,17 +15,11 @@ struct SavedPlacePreviewImage: View {
                     .resizable()
                     .scaledToFill()
             } else {
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(LaterrrPalette.accentSoft.opacity(0.55))
-                    .overlay {
-                        Image(systemName: place.source == .tiktok ? "binoculars.fill" : "cup.and.saucer.fill")
-                            .font(.system(size: 26, weight: .semibold))
-                            .foregroundStyle(LaterrrPalette.textPrimary)
-                    }
+                CrosshatchPlaceholder(caption: height >= 100 ? "No photo" : nil)
             }
         }
         .frame(width: width, height: height)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .clipped()
         .task(id: place.id) {
             await loadLookAroundPreviewIfNeeded()
         }

@@ -12,45 +12,55 @@ struct RootView: View {
     @State private var searchPath: [UUID] = []
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            Tab("Map", systemImage: "map.circle", value: RootTab.map) {
+        ZStack {
+            switch selectedTab {
+            case .map:
                 NavigationStack {
                     SavedPlacesMapView(openPlace: openPlaceFromMap)
                 }
-            }
 
-            Tab("Places", systemImage: "cup.and.saucer.fill", value: RootTab.places) {
+            case .places:
                 NavigationStack(path: $placesPath) {
                     PlacesListView(openPlace: openPlaceFromPlaces)
                         .navigationDestination(for: UUID.self) { placeID in
                             placeDestination(for: placeID)
                         }
                 }
-            }
 
-            Tab("Capture", systemImage: "camera.viewfinder", value: RootTab.capture) {
+            case .capture:
                 NavigationStack {
                     CaptureView()
                 }
-            }
 
-            Tab("Settings", systemImage: "slider.horizontal.3", value: RootTab.settings) {
-                NavigationStack {
-                    SettingsView()
-                }
-            }
-
-            Tab("Search", systemImage: "magnifyingglass", value: RootTab.search, role: .search) {
+            case .search:
                 NavigationStack(path: $searchPath) {
                     PlacesSearchView(openPlace: openPlaceFromSearch)
                         .navigationDestination(for: UUID.self) { placeID in
                             placeDestination(for: placeID)
                         }
                 }
+
+            case .settings:
+                NavigationStack {
+                    SettingsView()
+                }
             }
         }
-        .tabViewStyle(.sidebarAdaptable)
-        .tint(LaterrrPalette.accent)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            EditorialTabBar(
+                items: [
+                    ("Map", RootTab.map),
+                    ("Places", RootTab.places),
+                    ("Capture", RootTab.capture),
+                    ("Search", RootTab.search),
+                    ("More", RootTab.settings)
+                ],
+                selection: $selectedTab
+            )
+        }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .tint(LaterrrPalette.ink)
+        .background(LaterrrPalette.canvas)
         .environmentObject(settingsStore)
         .onAppear {
             tikTokImportCoordinator.processPendingImportsIfNeeded()
@@ -72,20 +82,20 @@ struct RootView: View {
         }
         .overlay {
             if tikTokImportCoordinator.isImporting {
-                Color.black.opacity(0.10)
+                LaterrrPalette.canvas.opacity(0.8)
                     .ignoresSafeArea()
                     .overlay {
-                        GlassCard(alignment: .center) {
-                            ProgressView()
-                                .tint(LaterrrPalette.accent)
+                        InkCard(alignment: .center) {
+                            InkSpinner(size: 36)
 
                             Text("Importing TikTok roundup")
-                                .font(LaterrrTypography.headline())
-                                .foregroundStyle(LaterrrPalette.textPrimary)
+                                .font(LaterrrTypography.display(24))
+                                .foregroundStyle(LaterrrPalette.ink)
+                                .multilineTextAlignment(.center)
 
                             Text("laterrr is loading the TikTok link, parsing the caption on-device, and matching places in Apple Maps.")
-                                .font(LaterrrTypography.body())
-                                .foregroundStyle(LaterrrPalette.textSecondary)
+                                .font(LaterrrTypography.body(.subheadline))
+                                .foregroundStyle(LaterrrPalette.inkSecondary)
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: 340)

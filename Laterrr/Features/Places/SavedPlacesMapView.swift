@@ -5,6 +5,7 @@ import SwiftUI
 struct SavedPlacesMapView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var cameraPosition: MapCameraPosition = .automatic
+    @StateObject private var locationStore = LocationStore()
 
     let openPlace: (SavedPlace) -> Void
 
@@ -12,19 +13,25 @@ struct SavedPlacesMapView: View {
         ZStack {
             LaterrrBackground()
 
-            if savedPlaces.isEmpty {
-                ScrollView {
-                    EmptyStateView(
-                        title: "Your saved map is still empty",
-                        message: "Capture a cafe or restaurant and laterrr drops a pin here for quick revisits.",
-                        systemImage: "cup.and.saucer.fill"
-                    )
-                    .padding(20)
-                }
-                .scrollIndicators(.hidden)
-            } else {
-                VStack(spacing: 0) {
+            VStack(spacing: 0) {
+                header
+
+                if savedPlaces.isEmpty {
+                    ScrollView {
+                        EmptyStateView(
+                            title: "Your saved map is still empty",
+                            message: "Capture a cafe or restaurant and laterrr drops a pin here for quick revisits.",
+                            systemImage: "cup.and.saucer.fill"
+                        )
+                        .padding(20)
+                    }
+                    .scrollIndicators(.hidden)
+                } else {
                     Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
+                        UserAnnotation(anchor: .center) { userLocation in
+                            UserLocationPin(heading: userLocation.heading?.trueHeading)
+                        }
+
                         ForEach(savedPlaces) { place in
                             Annotation(place.name, coordinate: place.coordinate, anchor: .bottom) {
                                 Button {
@@ -36,19 +43,46 @@ struct SavedPlacesMapView: View {
                             }
                         }
                     }
+                    .grayscale(1)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 16)
+                    .padding(.bottom, 16)
                     .onAppear(perform: updateCamera)
                     .onChange(of: savedPlaces.map(\.id)) { _, _ in
                         updateCamera()
                     }
+                    .onChange(of: locationStore.currentLocation) { _, _ in
+                        updateCamera()
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 14)
             }
         }
-        .navigationTitle("Places on Map")
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            locationStore.requestAuthorizationIfNeeded()
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            MicroText("Saved places — \(savedPlaces.count)", color: LaterrrPalette.inkSecondary)
+
+            Text("Map.")
+                .font(LaterrrTypography.display(44))
+                .foregroundStyle(LaterrrPalette.ink)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) {
+            HairlineDivider()
+        }
     }
 
     private func updateCamera() {
@@ -57,10 +91,16 @@ struct SavedPlacesMapView: View {
             return
         }
 
-        if savedPlaces.count == 1, let place = savedPlaces.first {
+        var coordinates = savedPlaces.map(\.coordinate)
+
+        if let userCoordinate = locationStore.currentLocation?.coordinate {
+            coordinates.append(userCoordinate)
+        }
+
+        if coordinates.count == 1, let coordinate = coordinates.first {
             cameraPosition = .region(
                 MKCoordinateRegion(
-                    center: place.coordinate,
+                    center: coordinate,
                     latitudinalMeters: 1200,
                     longitudinalMeters: 1200
                 )
@@ -68,8 +108,8 @@ struct SavedPlacesMapView: View {
             return
         }
 
-        let latitudes = savedPlaces.map(\.latitude)
-        let longitudes = savedPlaces.map(\.longitude)
+        let latitudes = coordinates.map(\.latitude)
+        let longitudes = coordinates.map(\.longitude)
 
         guard
             let minLatitude = latitudes.min(),
@@ -99,38 +139,77 @@ struct SavedPlacesMapView: View {
     }
 }
 
+private struct UserLocationPin: View {
+    let heading: Double?
+
+    var body: some View {
+        ZStack {
+            if let heading {
+                HeadingWedge()
+                    .fill(Color.black)
+                    .frame(width: 12, height: 9)
+                    .offset(y: -16)
+                    .rotationEffect(.degrees(heading))
+            }
+
+            Circle()
+                .fill(Color.white)
+                .frame(width: 20, height: 20)
+
+            Circle()
+                .strokeBorder(Color.black, lineWidth: 1.5)
+                .frame(width: 20, height: 20)
+
+            Circle()
+                .fill(Color.black)
+                .frame(width: 9, height: 9)
+        }
+        .accessibilityLabel("Your location")
+    }
+}
+
+private struct HeadingWedge: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
 private struct SavedPlaceMapPin: View {
     let place: SavedPlace
 
     var body: some View {
-        VStack(spacing: 6) {
-            Text(place.name)
-                .font(LaterrrTypography.caption(.caption2))
-                .foregroundStyle(LaterrrPalette.textPrimary)
+        VStack(spacing: 5) {
+            Text(place.name.uppercased())
+                .font(LaterrrTypography.micro(9))
+                .kerning(1.5)
+                .foregroundStyle(Color.black)
                 .lineLimit(1)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .glassEffect(
-                    Glass.regular.tint(Color.white.opacity(0.76)),
-                    in: Capsule()
-                )
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color.white)
                 .overlay {
-                    Capsule()
-                        .strokeBorder(Color.white.opacity(0.82), lineWidth: 1)
+                    Rectangle()
+                        .strokeBorder(Color.black, lineWidth: 1)
                 }
 
-            ZStack {
-                Image(systemName: "mappin.circle.fill")
-                    .font(.system(size: 36))
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(Color.white, LaterrrPalette.accent)
+            Rectangle()
+                .fill(Color.black)
+                .frame(width: 1, height: 10)
 
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    .offset(y: -1)
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 14, height: 14)
+
+                Circle()
+                    .fill(Color.black)
+                    .frame(width: 8, height: 8)
             }
         }
-        .shadow(color: LaterrrPalette.shadow, radius: 18, y: 10)
     }
 }
