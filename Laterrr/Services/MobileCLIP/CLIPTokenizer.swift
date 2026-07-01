@@ -54,7 +54,7 @@ final class CLIPTokenizer {
     private let endTokenID: Int
 
     init(resourceSubdirectory: String = "MobileCLIP/Tokenizer") throws {
-        guard let mergesURL = Bundle.main.url(
+        guard let mergesURL = Self.resourceURL(
             forResource: "clip-merges",
             withExtension: "txt",
             subdirectory: resourceSubdirectory
@@ -72,7 +72,7 @@ final class CLIPTokenizer {
         }
         bpeRanks = ranks
 
-        guard let vocabURL = Bundle.main.url(
+        guard let vocabURL = Self.resourceURL(
             forResource: "clip-vocab",
             withExtension: "json",
             subdirectory: resourceSubdirectory
@@ -96,6 +96,17 @@ final class CLIPTokenizer {
 
         self.startTokenID = startTokenID
         self.endTokenID = endTokenID
+    }
+
+    // Build phases can flatten bundle resources, so fall back to the bundle root
+    // when the expected subdirectory is missing (mirrors MobileCLIPVenueScorer.bundleURL).
+    private static func resourceURL(
+        forResource name: String,
+        withExtension fileExtension: String,
+        subdirectory: String
+    ) -> URL? {
+        Bundle.main.url(forResource: name, withExtension: fileExtension, subdirectory: subdirectory)
+            ?? Bundle.main.url(forResource: name, withExtension: fileExtension)
     }
 
     func encodeFull(text: String) -> [Int] {

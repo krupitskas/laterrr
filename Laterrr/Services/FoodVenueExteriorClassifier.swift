@@ -114,7 +114,6 @@ enum FoodVenueExteriorClassifier {
         "painting",
         "pet",
         "receipt",
-        "sign",
         "sofa",
         "toilet"
     ]
