@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FB0000000000000000000004 /* ReviewTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000005 /* ReviewTabView.swift */; };
 		FB0000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000001 /* Assets.xcassets */; };
 		FB0000000000000000000002 /* InstrumentSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */; };
 		FB0000000000000000000003 /* InstrumentSerif-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */; };
@@ -77,6 +78,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section (Laterrr resources) */
+		FA0000000000000000000005 /* ReviewTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTabView.swift; sourceTree = "<group>"; };
 		FA0000000000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Regular.ttf"; sourceTree = "<group>"; };
 		FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Italic.ttf"; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				1C27368F439AF92C309AE64C /* PhotoLibraryReviewController.swift */,
 				1382E5E501BB8A52FA05819C /* PhotoLibraryReviewView.swift */,
 				8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */,
+				FA0000000000000000000005 /* ReviewTabView.swift */,
 				6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */,
 				E13C1ADE6131666B8A48A012 /* SavedPlacePreviewImage.swift */,
 				05F5056D29EB3D0045E156D8 /* SavedPlacesMapView.swift */,
@@ -500,6 +503,7 @@
 				0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */,
 				143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */,
 				86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */,
+				FB0000000000000000000004 /* ReviewTabView.swift in Sources */,
 				BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */,
 				839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */,
 				439729F78867E8C033BFD058 /* SavedPlaceDetailView.swift in Sources */,

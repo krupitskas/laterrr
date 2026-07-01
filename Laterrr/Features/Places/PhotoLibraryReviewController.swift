@@ -194,6 +194,18 @@ final class PhotoLibraryReviewController: ObservableObject {
         removeCurrentCandidate()
     }
 
+    func stopScanning() {
+        guard isScanning else { return }
+
+        reviewTask?.cancel()
+        reviewTask = nil
+        isScanning = false
+
+        if deck?.candidates.isEmpty ?? true {
+            resetSession(preserveAlert: false)
+        }
+    }
+
     func dismissReview() {
         reviewTask?.cancel()
         reviewTask = nil

@@ -10,7 +10,9 @@ struct TikTokImportReviewView: View {
     var body: some View {
         GeometryReader { geometry in
             let cardWidth = min(geometry.size.width - 40, 420)
-            let cardHeight = min(max(geometry.size.height - 220, 320), 500)
+            // Reserve room for the header (~170pt), footer (~50pt), paddings and
+            // spacing so the Skip/Save row never gets pushed into the screen edge.
+            let cardHeight = min(max(geometry.size.height - 330, 300), 480)
 
             ZStack {
                 LaterrrBackground()
@@ -32,7 +34,8 @@ struct TikTokImportReviewView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 40)
             }
         }
     }

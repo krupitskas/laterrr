@@ -9,20 +9,23 @@ struct SavedPlacePreviewImage: View {
     @State private var fetchedSnapshotData: Data?
 
     var body: some View {
-        Group {
-            if let previewData, let image = UIImage(data: previewData) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                CrosshatchPlaceholder(caption: height >= 100 ? "No photo" : nil)
+        // The image lives in an overlay so a wide photo can never stretch the
+        // layout past the proposed width; the clear base defines the frame.
+        Color.clear
+            .frame(width: width, height: height)
+            .overlay {
+                if let previewData, let image = UIImage(data: previewData) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    CrosshatchPlaceholder(caption: height >= 100 ? "No photo" : nil)
+                }
             }
-        }
-        .frame(width: width, height: height)
-        .clipped()
-        .task(id: place.id) {
-            await loadLookAroundPreviewIfNeeded()
-        }
+            .clipped()
+            .task(id: place.id) {
+                await loadLookAroundPreviewIfNeeded()
+            }
     }
 
     private var previewData: Data? {

@@ -9,51 +9,19 @@ struct RootView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var selectedTab: RootTab = .capture
     @State private var placesPath: [UUID] = []
-    @State private var searchPath: [UUID] = []
 
     var body: some View {
-        ZStack {
-            switch selectedTab {
-            case .map:
-                NavigationStack {
-                    SavedPlacesMapView(openPlace: openPlaceFromMap)
-                }
+        VStack(spacing: 0) {
+            tabContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            case .places:
-                NavigationStack(path: $placesPath) {
-                    PlacesListView(openPlace: openPlaceFromPlaces)
-                        .navigationDestination(for: UUID.self) { placeID in
-                            placeDestination(for: placeID)
-                        }
-                }
-
-            case .capture:
-                NavigationStack {
-                    CaptureView()
-                }
-
-            case .search:
-                NavigationStack(path: $searchPath) {
-                    PlacesSearchView(openPlace: openPlaceFromSearch)
-                        .navigationDestination(for: UUID.self) { placeID in
-                            placeDestination(for: placeID)
-                        }
-                }
-
-            case .settings:
-                NavigationStack {
-                    SettingsView()
-                }
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
             EditorialTabBar(
                 items: [
                     ("Map", RootTab.map),
                     ("Places", RootTab.places),
                     ("Capture", RootTab.capture),
-                    ("Search", RootTab.search),
-                    ("More", RootTab.settings)
+                    ("Review", RootTab.review),
+                    ("Settings", RootTab.settings)
                 ],
                 selection: $selectedTab
             )
@@ -118,17 +86,47 @@ struct RootView: View {
         }
     }
 
+    @ViewBuilder
+    private var tabContent: some View {
+        ZStack {
+            switch selectedTab {
+            case .map:
+                NavigationStack {
+                    SavedPlacesMapView(openPlace: openPlaceFromMap)
+                }
+
+            case .places:
+                NavigationStack(path: $placesPath) {
+                    PlacesListView(openPlace: openPlaceFromPlaces)
+                        .navigationDestination(for: UUID.self) { placeID in
+                            placeDestination(for: placeID)
+                        }
+                }
+
+            case .capture:
+                NavigationStack {
+                    CaptureView()
+                }
+
+            case .review:
+                NavigationStack {
+                    ReviewTabView()
+                }
+
+            case .settings:
+                NavigationStack {
+                    SettingsView()
+                }
+            }
+        }
+    }
+
     private func openPlaceFromMap(_ place: SavedPlace) {
         showPlace(place, switchToPlacesTab: true)
     }
 
     private func openPlaceFromPlaces(_ place: SavedPlace) {
         showPlace(place, switchToPlacesTab: false)
-    }
-
-    private func openPlaceFromSearch(_ place: SavedPlace) {
-        searchPath = [place.id]
-        selectedTab = .search
     }
 
     private func showPlace(_ place: SavedPlace, switchToPlacesTab: Bool) {
@@ -158,6 +156,6 @@ private enum RootTab: Hashable {
     case map
     case places
     case capture
+    case review
     case settings
-    case search
 }

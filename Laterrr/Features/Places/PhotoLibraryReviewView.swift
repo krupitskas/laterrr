@@ -11,7 +11,9 @@ struct PhotoLibraryReviewView: View {
     var body: some View {
         GeometryReader { geometry in
             let cardWidth = min(geometry.size.width - 40, 430)
-            let cardHeight = min(max(geometry.size.height - 220, 380), 580)
+            // Reserve room for the header (~230pt), footer (~50pt), paddings and
+            // spacing so the Skip/Save row never gets pushed into the screen edge.
+            let cardHeight = min(max(geometry.size.height - 400, 320), 560)
 
             ZStack {
                 LaterrrBackground()
@@ -41,7 +43,8 @@ struct PhotoLibraryReviewView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 40)
             }
         }
         .task(id: controller.currentCandidate?.id) {
@@ -65,7 +68,30 @@ struct PhotoLibraryReviewView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            MicroText("Photos review", color: LaterrrPalette.inkSecondary)
+            HStack(alignment: .center) {
+                MicroText("Photos review", color: LaterrrPalette.inkSecondary)
+
+                Spacer()
+
+                Button {
+                    if controller.isScanning {
+                        controller.stopScanning()
+                    } else {
+                        controller.dismissReview()
+                    }
+                } label: {
+                    MicroText(controller.isScanning ? "Stop" : "Close", size: 9, kerning: 1.5)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(controller.isScanning ? "Stop scanning" : "Close review")
+            }
 
             Text(controller.progressTitle)
                 .font(LaterrrTypography.display(26))

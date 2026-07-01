@@ -56,9 +56,9 @@ struct SettingsView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            MicroText("Settings", color: LaterrrPalette.inkSecondary)
+            MicroText("Preferences", color: LaterrrPalette.inkSecondary)
 
-            Text("More.")
+            Text("Settings.")
                 .font(LaterrrTypography.display(44))
                 .foregroundStyle(LaterrrPalette.ink)
         }
