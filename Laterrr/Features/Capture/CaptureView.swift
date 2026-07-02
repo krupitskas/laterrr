@@ -8,7 +8,7 @@ struct CaptureView: View {
     @EnvironmentObject private var settingsStore: SettingsStore
     @EnvironmentObject private var tikTokImportCoordinator: TikTokImportCoordinator
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var viewModel = CaptureViewModel()
+    @ObservedObject var viewModel: CaptureViewModel
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var pinchBaseZoomFactor: CGFloat?
     @State private var pastedTikTokURLString = ""
@@ -107,21 +107,10 @@ struct CaptureView: View {
                 .contentShape(Rectangle())
                 .gesture(cameraZoomGesture)
         } else if isCameraLoading {
-            viewfinderPlaceholder {
-                VStack(spacing: 18) {
-                    InkSpinner(size: 36, color: .white)
-
-                    Text("loading camera")
-                        .font(LaterrrTypography.display(30))
-                        .foregroundStyle(Color.white)
-
-                    Text("laterrr is warming up the camera so you can capture the place in one shot.")
-                        .font(LaterrrTypography.body(.subheadline))
-                        .foregroundStyle(Color.white.opacity(0.6))
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: 320)
-                }
-            }
+            // A plain black frame, exactly like the system Camera app while it
+            // opens — no loading copy, the preview replaces it within a moment.
+            Color.black
+                .ignoresSafeArea()
         } else {
             viewfinderPlaceholder {
                 VStack(spacing: 16) {

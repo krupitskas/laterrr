@@ -10,6 +10,10 @@ struct RootView: View {
     @State private var selectedTab: RootTab = .capture
     @State private var placesPath: [UUID] = []
 
+    // Owned here so the camera session survives tab switches and stays warm
+    // for the whole app session — returning to Capture is instant.
+    @StateObject private var captureViewModel = CaptureViewModel()
+
     var body: some View {
         VStack(spacing: 0) {
             tabContent
@@ -31,10 +35,12 @@ struct RootView: View {
         .background(LaterrrPalette.canvas)
         .environmentObject(settingsStore)
         .onAppear {
+            captureViewModel.onAppear()
             tikTokImportCoordinator.processPendingImportsIfNeeded()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
+            captureViewModel.cameraSession.startRunning()
             tikTokImportCoordinator.processPendingImportsIfNeeded()
         }
         .fullScreenCover(item: $tikTokImportCoordinator.reviewState) { reviewState in
@@ -105,7 +111,7 @@ struct RootView: View {
 
             case .capture:
                 NavigationStack {
-                    CaptureView()
+                    CaptureView(viewModel: captureViewModel)
                 }
 
             case .review:

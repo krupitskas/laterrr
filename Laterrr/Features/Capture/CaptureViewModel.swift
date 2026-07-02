@@ -38,8 +38,9 @@ final class CaptureViewModel: ObservableObject {
         cameraSession.prepare()
     }
 
+    // The camera session intentionally keeps running across tab switches so
+    // returning to Capture is instant; the system pauses it in the background.
     func onDisappear() {
-        cameraSession.stopRunning()
         clearBanner()
     }
 
