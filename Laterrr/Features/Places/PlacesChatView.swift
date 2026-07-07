@@ -7,7 +7,10 @@ import SwiftUI
 
 @Generable
 struct ConciergeResponse {
-    @Guide(description: "Exactly three picks from the provided saved places, best match first.", .count(3))
+    @Guide(description: "A short, warm reply to the user: one to three sentences. If nothing fits the request, say so honestly and point at the alternatives you picked.")
+    let message: String
+
+    @Guide(description: "Zero to three picks from the provided saved places, best match first. One pick is fine when a single place clearly fits.", .maximumCount(3))
     let picks: [ConciergePick]
 }
 
@@ -61,10 +64,13 @@ final class PlacesChatModel: ObservableObject {
     private static let instructions = """
     You are the concierge for laterrr, an app where people save cafes, restaurants, and bars \
     they want to visit later. You will receive the user's saved places (with id, name, category, \
-    cuisine guesses, address, distance from the user, and notes) and a request. Pick exactly the \
-    three places from the list that best fit the request, best first. Prefer closer places when \
-    the request implies proximity. Copy each place id exactly as given. Keep every reason short, \
-    concrete, and warm.
+    cuisine guesses, address, distance from the user, and notes) and a request. Reply with a \
+    short warm message and zero to three picks from the list. If one place clearly fits, pick \
+    just that one and say why. If nothing truly fits, say so honestly in the message (they can \
+    go capture new places) and offer one or two of the closest reasonable alternatives from the \
+    list as picks, framing them as alternatives. Never invent places — only use ids copied \
+    exactly from the list. Prefer closer places when the request implies proximity. Keep every \
+    reason short, concrete, and warm.
     """
 
     private var hasExplainedFallback = false
@@ -115,10 +121,10 @@ final class PlacesChatModel: ObservableObject {
 
         entries.append(.user(id: UUID(), text: trimmed))
 
-        guard places.count >= 3 else {
+        guard !places.isEmpty else {
             entries.append(.assistant(
                 id: UUID(),
-                text: "Save at least three places first — then I have something to choose from."
+                text: "Save a place first — then I have something to choose from."
             ))
             return
         }
@@ -171,13 +177,36 @@ final class PlacesChatModel: ObservableObject {
         isDownloadingModel = true
         downloadProgress = 0
 
+        // The hub reports per-file progress and the model is basically one big
+        // file, so track real bytes on disk for a smooth bar.
+        let bytePollTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(700))
+
+                guard let self, self.isDownloadingModel else { return }
+
+                let byteFraction = min(
+                    0.99,
+                    Double(MLXConciergeEngine.downloadedBytes)
+                        / Double(MLXConciergeEngine.expectedDownloadBytes)
+                )
+
+                if byteFraction > self.downloadProgress {
+                    self.downloadProgress = byteFraction
+                }
+            }
+        }
+
         Task { [weak self] in
             guard let self else { return }
+
+            defer { bytePollTask.cancel() }
 
             do {
                 try await MLXConciergeEngine.shared.prepare { fraction in
                     Task { @MainActor [weak self] in
-                        self?.downloadProgress = fraction
+                        guard let self else { return }
+                        self.downloadProgress = max(self.downloadProgress, fraction)
                     }
                 }
 
@@ -215,7 +244,7 @@ final class PlacesChatModel: ObservableObject {
 
                 Request: \(request)
 
-                Pick exactly three places from the list above that best fit the request.
+                Reply with a short message and up to three picks from the list above.
                 """
 
                 let response = try await session.respond(to: prompt, generating: ConciergeResponse.self)
@@ -245,9 +274,11 @@ final class PlacesChatModel: ObservableObject {
 
                 Request: \(request)
 
-                Reply with ONLY a JSON array of exactly three objects, best match first, like:
-                [{"id":"<place id copied exactly>","reason":"<one short sentence>"}]
-                No other text. /no_think
+                Reply with ONLY a JSON object, no other text, like:
+                {"message":"<one to three warm sentences>","picks":[{"id":"<place id copied exactly>","reason":"<one short sentence>"}]}
+                Include zero to three picks, best first — just one if a single place clearly fits. \
+                If nothing truly fits, say so honestly in the message and offer up to two \
+                alternatives from the list as picks. /no_think
                 """
 
                 let output = try await MLXConciergeEngine.shared.respond(
@@ -255,12 +286,17 @@ final class PlacesChatModel: ObservableObject {
                     prompt: prompt
                 )
 
-                let picks = parsePicks(from: output, places: places)
+                if let reply = parseConciergeReply(from: output, places: places),
+                   !(reply.message.isEmpty && reply.picks.isEmpty) {
+                    if !reply.message.isEmpty {
+                        entries.append(.assistant(id: UUID(), text: reply.message))
+                    }
 
-                if picks.isEmpty {
-                    entries.append(.picks(id: UUID(), picks: fallbackPicks(request: request, places: places)))
+                    if !reply.picks.isEmpty {
+                        entries.append(.picks(id: UUID(), picks: Array(reply.picks.prefix(3))))
+                    }
                 } else {
-                    entries.append(.picks(id: UUID(), picks: Array(picks.prefix(3))))
+                    entries.append(.picks(id: UUID(), picks: fallbackPicks(request: request, places: places)))
                 }
             } catch {
                 entries.append(.assistant(
@@ -275,8 +311,12 @@ final class PlacesChatModel: ObservableObject {
     }
 
     // Small local models don't do guided generation, so parse leniently:
-    // strip thinking blocks, find the JSON array, decode what we can.
-    private func parsePicks(from output: String, places: [SavedPlace]) -> [Pick] {
+    // strip thinking blocks, find the JSON object (or a bare picks array),
+    // and decode what we can.
+    private func parseConciergeReply(
+        from output: String,
+        places: [SavedPlace]
+    ) -> (message: String, picks: [Pick])? {
         var text = output
 
         while
@@ -286,28 +326,46 @@ final class PlacesChatModel: ObservableObject {
             text.removeSubrange(start.lowerBound ..< end.upperBound)
         }
 
-        guard
-            let first = text.firstIndex(of: "["),
-            let last = text.lastIndex(of: "]"),
-            first < last
-        else {
-            return []
-        }
-
         struct RawPick: Decodable {
             let id: String
             let reason: String
         }
 
-        let json = String(text[first ... last])
-        guard let rawPicks = try? JSONDecoder().decode([RawPick].self, from: Data(json.utf8)) else {
-            return []
+        struct RawReply: Decodable {
+            let message: String?
+            let picks: [RawPick]?
         }
 
-        return resolvedPicks(
-            from: rawPicks.map { (identifier: $0.id, reason: $0.reason) },
-            places: places
-        )
+        if
+            let first = text.firstIndex(of: "{"),
+            let last = text.lastIndex(of: "}"),
+            first < last,
+            let rawReply = try? JSONDecoder().decode(RawReply.self, from: Data(String(text[first ... last]).utf8)) {
+            let picks = resolvedPicks(
+                from: (rawReply.picks ?? []).map { (identifier: $0.id, reason: $0.reason) },
+                places: places
+            )
+            return (
+                (rawReply.message ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
+                picks
+            )
+        }
+
+        if
+            let first = text.firstIndex(of: "["),
+            let last = text.lastIndex(of: "]"),
+            first < last,
+            let rawPicks = try? JSONDecoder().decode([RawPick].self, from: Data(String(text[first ... last]).utf8)) {
+            return (
+                "",
+                resolvedPicks(
+                    from: rawPicks.map { (identifier: $0.id, reason: $0.reason) },
+                    places: places
+                )
+            )
+        }
+
+        return nil
     }
 
     private func welcomeMessage(places: [SavedPlace]) -> String {
@@ -438,14 +496,21 @@ final class PlacesChatModel: ObservableObject {
             from: response.picks.map { (identifier: $0.placeID, reason: $0.reason) },
             places: places
         )
+        let message = response.message.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if picks.isEmpty {
+        if !message.isEmpty {
+            entries.append(.assistant(id: UUID(), text: message))
+        }
+
+        if !picks.isEmpty {
+            entries.append(.picks(id: UUID(), picks: Array(picks.prefix(3))))
+        }
+
+        if message.isEmpty, picks.isEmpty {
             entries.append(.assistant(
                 id: UUID(),
                 text: "I couldn't line that up with your saved places — try wording it differently."
             ))
-        } else {
-            entries.append(.picks(id: UUID(), picks: Array(picks.prefix(3))))
         }
     }
 
@@ -577,7 +642,7 @@ struct PlacesChatView: View {
                     if model.isDownloadingModel {
                         VStack(alignment: .leading, spacing: 8) {
                             MicroText(
-                                "Download concierge — \(Int((model.downloadProgress * 100).rounded()))%",
+                                "Download concierge — \(Int((model.downloadProgress * 100).rounded()))% of ~1 GB",
                                 size: 9,
                                 kerning: 1.5,
                                 color: LaterrrPalette.inkSecondary

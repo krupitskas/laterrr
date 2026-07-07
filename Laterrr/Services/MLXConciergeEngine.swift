@@ -36,6 +36,29 @@ actor MLXConciergeEngine {
             .appendingPathComponent("ConciergeModels", isDirectory: true)
     }
 
+    // Rough total size of the Qwen3-1.7B-4bit snapshot. The hub's own progress
+    // counts files (the model is basically one big file), so real progress is
+    // derived from bytes on disk against this estimate.
+    nonisolated static let expectedDownloadBytes: Int64 = 1_050_000_000
+
+    nonisolated static var downloadedBytes: Int64 {
+        guard let enumerator = FileManager.default.enumerator(
+            at: modelsDirectory,
+            includingPropertiesForKeys: [.fileSizeKey]
+        ) else {
+            return 0
+        }
+
+        var total: Int64 = 0
+        for case let url as URL in enumerator {
+            if let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize {
+                total += Int64(size)
+            }
+        }
+
+        return total
+    }
+
     nonisolated static var isModelDownloaded: Bool {
         guard let enumerator = FileManager.default.enumerator(
             at: modelsDirectory,

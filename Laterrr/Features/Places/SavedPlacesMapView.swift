@@ -5,6 +5,7 @@ import SwiftUI
 struct SavedPlacesMapView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var isAwaitingFocusOnUser = false
     @StateObject private var locationStore = LocationStore()
 
     let openPlace: (SavedPlace) -> Void
@@ -75,8 +76,19 @@ struct SavedPlacesMapView: View {
                     .onChange(of: savedPlaces.map(\.id)) { _, _ in
                         updateCamera()
                     }
-                    .onChange(of: locationStore.currentLocation) { _, _ in
-                        updateCamera()
+                    .onChange(of: locationStore.currentLocation) { previousLocation, newLocation in
+                        guard newLocation != nil else { return }
+
+                        if isAwaitingFocusOnUser {
+                            // The focus button was tapped before a fix existed —
+                            // honor that intent now instead of refitting the overview.
+                            isAwaitingFocusOnUser = false
+                            focusOnUser()
+                        } else if previousLocation == nil {
+                            // Only the first fix refits the overview; later fixes
+                            // must not yank the camera away from the user.
+                            updateCamera()
+                        }
                     }
                 }
             }
@@ -106,6 +118,7 @@ struct SavedPlacesMapView: View {
 
     private func focusOnUser() {
         guard let coordinate = locationStore.currentLocation?.coordinate else {
+            isAwaitingFocusOnUser = true
             locationStore.requestAuthorizationIfNeeded()
             return
         }
