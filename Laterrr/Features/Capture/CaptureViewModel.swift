@@ -100,6 +100,7 @@ final class CaptureViewModel: ObservableObject {
                 analysisMode: currentReviewState.analysis.analysisMethod,
                 source: .camera,
                 websiteURLString: suggestion.websiteURL?.absoluteString,
+                cuisineTags: currentReviewState.analysis.cuisineTags,
                 photoData: settings.keepPhotoSnapshot ? currentReviewState.photo.data : nil
             ),
             in: modelContext

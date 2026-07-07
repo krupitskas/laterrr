@@ -18,6 +18,7 @@ final class SavedPlace {
     var analysisMode: String
     var sourceRawValue: String
     var websiteURLString: String?
+    var cuisineTagsRawValue: String?
 
     @Attribute(.externalStorage) var photoData: Data?
 
@@ -36,6 +37,7 @@ final class SavedPlace {
         analysisMode: String,
         source: SavedPlaceSource = .camera,
         websiteURLString: String? = nil,
+        cuisineTags: [String] = [],
         photoData: Data? = nil
     ) {
         self.id = id
@@ -52,6 +54,7 @@ final class SavedPlace {
         self.analysisMode = analysisMode
         self.sourceRawValue = source.rawValue
         self.websiteURLString = websiteURLString
+        self.cuisineTagsRawValue = cuisineTags.isEmpty ? nil : cuisineTags.joined(separator: ",")
         self.photoData = photoData
     }
 
@@ -70,6 +73,19 @@ final class SavedPlace {
     var source: SavedPlaceSource {
         get { SavedPlaceSource(rawValue: sourceRawValue) ?? .camera }
         set { sourceRawValue = newValue.rawValue }
+    }
+
+    /// On-device MobileCLIP guesses like "Sushi" or "Fine Dining".
+    var cuisineTags: [String] {
+        get {
+            (cuisineTagsRawValue ?? "")
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+        }
+        set {
+            cuisineTagsRawValue = newValue.isEmpty ? nil : newValue.joined(separator: ",")
+        }
     }
 
     /// Older saves stored raw MapKit identifiers mangled by `.capitalized`
@@ -109,6 +125,7 @@ struct SavedPlaceDraft {
     let analysisMode: String
     let source: SavedPlaceSource
     let websiteURLString: String?
+    var cuisineTags: [String] = []
     let photoData: Data?
 
     func makeModel() -> SavedPlace {
@@ -126,6 +143,7 @@ struct SavedPlaceDraft {
             analysisMode: analysisMode,
             source: source,
             websiteURLString: websiteURLString,
+            cuisineTags: cuisineTags,
             photoData: photoData
         )
     }
@@ -219,6 +237,10 @@ enum SavedPlaceStore {
 
         if existing.websiteURLString == nil || existing.websiteURLString?.isEmpty == true {
             existing.websiteURLString = incoming.websiteURLString
+        }
+
+        if existing.cuisineTags.isEmpty, !incoming.cuisineTags.isEmpty {
+            existing.cuisineTags = incoming.cuisineTags
         }
 
         if incoming.photoData != nil && (existing.photoData == nil || incomingPriority >= existingPriority) {

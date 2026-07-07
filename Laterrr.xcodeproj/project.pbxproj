@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FB0000000000000000000009 /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = FC0000000000000000000006 /* HuggingFace */; };
+		FB000000000000000000000A /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = FC0000000000000000000007 /* Tokenizers */; };
+		FB000000000000000000000B /* MLXHuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = FC0000000000000000000008 /* MLXHuggingFace */; };
+		FB0000000000000000000008 /* MLXConciergeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000007 /* MLXConciergeEngine.swift */; };
+		FB0000000000000000000006 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = FC0000000000000000000002 /* MLXLLM */; };
+		FB0000000000000000000007 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = FC0000000000000000000003 /* MLXLMCommon */; };
+		FB0000000000000000000005 /* PlacesChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000006 /* PlacesChatView.swift */; };
 		FB0000000000000000000004 /* ReviewTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000005 /* ReviewTabView.swift */; };
 		FB0000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000001 /* Assets.xcassets */; };
 		FB0000000000000000000002 /* InstrumentSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */; };
@@ -79,6 +86,8 @@
 
 /* Begin PBXFileReference section (Laterrr resources) */
 		FA0000000000000000000005 /* ReviewTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTabView.swift; sourceTree = "<group>"; };
+		FA0000000000000000000006 /* PlacesChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesChatView.swift; sourceTree = "<group>"; };
+		FA0000000000000000000007 /* MLXConciergeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLXConciergeEngine.swift; sourceTree = "<group>"; };
 		FA0000000000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FA0000000000000000000002 /* InstrumentSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Regular.ttf"; sourceTree = "<group>"; };
 		FA0000000000000000000003 /* InstrumentSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Italic.ttf"; sourceTree = "<group>"; };
@@ -255,6 +264,7 @@
 				1C27368F439AF92C309AE64C /* PhotoLibraryReviewController.swift */,
 				1382E5E501BB8A52FA05819C /* PhotoLibraryReviewView.swift */,
 				8DA20D4D691B7507BCA1E86D /* PlacesListView.swift */,
+				FA0000000000000000000006 /* PlacesChatView.swift */,
 				FA0000000000000000000005 /* ReviewTabView.swift */,
 				6CD11A51632C881EB3AC48D6 /* SavedPlaceDetailView.swift */,
 				E13C1ADE6131666B8A48A012 /* SavedPlacePreviewImage.swift */,
@@ -341,6 +351,7 @@
 				2739E7E9D67A9AA602C2E514 /* LookAroundSnapshotService.swift */,
 				7CBB57BF1812A2126FD394F6 /* LookAroundVerifier.swift */,
 				3126750A6288313C256DBDB5 /* MapsExporter.swift */,
+				FA0000000000000000000007 /* MLXConciergeEngine.swift */,
 				5FA3335F3AA6E072BD24F2B3 /* NearbyVenueSearcher.swift */,
 				A4C6CF26521E97BCF0DDC9EB /* PlaceCapturePipeline.swift */,
 				DE6CF5903E018CB0E839C583 /* SettingsStore.swift */,
@@ -409,6 +420,7 @@
 			buildConfigurationList = 83F58245680507D15FDEC0C1 /* Build configuration list for PBXNativeTarget "Laterrr" */;
 			buildPhases = (
 				8597D24451D2EFCFFA4CD568 /* Sources */,
+				FD0000000000000000000001 /* Frameworks */,
 				5BD735710299D29FC31E78B1 /* Resources */,
 				8E81E1EF7CB2EE7CA41C066A /* Embed Foundation Extensions */,
 			);
@@ -419,12 +431,87 @@
 			);
 			name = Laterrr;
 			packageProductDependencies = (
+				FC0000000000000000000002 /* MLXLLM */,
+				FC0000000000000000000003 /* MLXLMCommon */,
+				FC0000000000000000000006 /* HuggingFace */,
+				FC0000000000000000000007 /* Tokenizers */,
+				FC0000000000000000000008 /* MLXHuggingFace */,
 			);
 			productName = Laterrr;
 			productReference = 21126B979BC6B0FA26C6FFBE /* Laterrr.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FC0000000000000000000001 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		FC0000000000000000000004 /* XCRemoteSwiftPackageReference "swift-huggingface" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-huggingface";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
+		FC0000000000000000000005 /* XCRemoteSwiftPackageReference "swift-transformers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-transformers";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FC0000000000000000000002 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC0000000000000000000001 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		FC0000000000000000000003 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC0000000000000000000001 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
+		FC0000000000000000000006 /* HuggingFace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC0000000000000000000004 /* XCRemoteSwiftPackageReference "swift-huggingface" */;
+			productName = HuggingFace;
+		};
+		FC0000000000000000000007 /* Tokenizers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC0000000000000000000005 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Tokenizers;
+		};
+		FC0000000000000000000008 /* MLXHuggingFace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC0000000000000000000001 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXHuggingFace;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FD0000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB0000000000000000000006 /* MLXLLM in Frameworks */,
+				FB0000000000000000000007 /* MLXLMCommon in Frameworks */,
+				FB0000000000000000000009 /* HuggingFace in Frameworks */,
+				FB000000000000000000000A /* Tokenizers in Frameworks */,
+				FB000000000000000000000B /* MLXHuggingFace in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXProject section */
 		105F6FEF4BC3339D0CABE0B0 /* Project object */ = {
@@ -436,6 +523,11 @@
 			buildConfigurationList = 277E7E09785A44AD11185EEC /* Build configuration list for PBXProject "Laterrr" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
+			packageReferences = (
+				FC0000000000000000000001 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				FC0000000000000000000004 /* XCRemoteSwiftPackageReference "swift-huggingface" */,
+				FC0000000000000000000005 /* XCRemoteSwiftPackageReference "swift-transformers" */,
+			);
 			knownRegions = (
 				Base,
 				en,
@@ -503,6 +595,8 @@
 				0CB281364909AA790A3BA60E /* PlaceCapturePipeline.swift in Sources */,
 				143802473357A4959C0E718A /* PlaceSuggestion.swift in Sources */,
 				86B836E2C5EDF22784EFFF80 /* PlacesListView.swift in Sources */,
+				FB0000000000000000000008 /* MLXConciergeEngine.swift in Sources */,
+				FB0000000000000000000005 /* PlacesChatView.swift in Sources */,
 				FB0000000000000000000004 /* ReviewTabView.swift in Sources */,
 				BC7D489942D9EBF37F1A6C55 /* RootView.swift in Sources */,
 				839996CCE45E0B3C45DB3979 /* SavedPlace.swift in Sources */,

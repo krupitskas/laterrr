@@ -233,6 +233,7 @@ final class PhotoLibraryReviewController: ObservableObject {
                 analysisMode: "\(candidate.analysis.analysisMethod) + Photos review",
                 source: .photoLibrary,
                 websiteURLString: suggestion.websiteURL?.absoluteString,
+                cuisineTags: candidate.analysis.cuisineTags,
                 photoData: candidate.photoData
             ),
             in: modelContext

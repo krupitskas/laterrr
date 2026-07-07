@@ -6,6 +6,7 @@ struct PlacesListView: View {
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
 
     let openPlace: (SavedPlace) -> Void
+    var openChat: () -> Void = {}
 
     @State private var searchText = ""
     @State private var selectedCategory: String?
@@ -118,6 +119,24 @@ struct PlacesListView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel("Clear search")
                 }
+
+                Button {
+                    isSearchFocused = false
+                    openChat()
+                } label: {
+                    Text("hmmm…")
+                        .font(LaterrrTypography.accent(16))
+                        .foregroundStyle(LaterrrPalette.ink)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Ask the concierge where to go")
             }
 
             HairlineDivider()

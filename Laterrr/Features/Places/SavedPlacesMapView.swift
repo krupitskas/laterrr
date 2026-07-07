@@ -234,33 +234,20 @@ private struct SavedPlaceMapPin: View {
     let place: SavedPlace
 
     var body: some View {
-        VStack(spacing: 5) {
-            Text(place.name.uppercased())
-                .font(LaterrrTypography.micro(9))
-                .kerning(1.5)
-                .foregroundStyle(Color.black)
-                .lineLimit(1)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(Color.white)
-                .overlay {
-                    Rectangle()
-                        .strokeBorder(Color.black, lineWidth: 1)
-                }
+        // The Annotation title already labels the pin below the dot,
+        // so the pin itself stays a bare monochrome dot.
+        ZStack {
+            Circle()
+                .fill(Color.white)
+                .frame(width: 16, height: 16)
 
-            Rectangle()
+            Circle()
+                .strokeBorder(Color.black, lineWidth: 1)
+                .frame(width: 16, height: 16)
+
+            Circle()
                 .fill(Color.black)
-                .frame(width: 1, height: 10)
-
-            ZStack {
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 14, height: 14)
-
-                Circle()
-                    .fill(Color.black)
-                    .frame(width: 8, height: 8)
-            }
+                .frame(width: 9, height: 9)
         }
     }
 }

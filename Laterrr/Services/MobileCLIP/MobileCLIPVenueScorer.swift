@@ -70,12 +70,41 @@ actor MobileCLIPVenueScorer {
         .init(identifier: "indoor_dining_room", text: "a photo of an indoor dining room", kind: .negative)
     ]
 
+    // Zero-shot cuisine descriptors scored against the same image embedding.
+    private static let cuisinePromptCatalog: [(tag: String, text: String)] = [
+        ("Sushi", "a photo of a sushi restaurant"),
+        ("Ramen", "a photo of a ramen shop"),
+        ("Korean", "a photo of a korean restaurant"),
+        ("Chinese", "a photo of a chinese restaurant"),
+        ("Thai", "a photo of a thai restaurant"),
+        ("Vietnamese", "a photo of a vietnamese pho restaurant"),
+        ("Indian", "a photo of an indian restaurant"),
+        ("Pizza", "a photo of a pizzeria"),
+        ("Italian", "a photo of an italian trattoria"),
+        ("French", "a photo of a french bistro"),
+        ("Fine dining", "a photo of an upscale fine dining restaurant"),
+        ("Burgers", "a photo of a burger joint"),
+        ("Mexican", "a photo of a mexican taqueria"),
+        ("Mediterranean", "a photo of a mediterranean restaurant"),
+        ("Middle Eastern", "a photo of a middle eastern kebab restaurant"),
+        ("Seafood", "a photo of a seafood restaurant"),
+        ("Steakhouse", "a photo of a steakhouse"),
+        ("Barbecue", "a photo of a barbecue restaurant"),
+        ("Vegan", "a photo of a vegan restaurant"),
+        ("Brunch", "a photo of a brunch cafe"),
+        ("Bakery", "a photo of a bakery with pastries"),
+        ("Specialty coffee", "a photo of a specialty coffee shop"),
+        ("Wine bar", "a photo of a wine bar"),
+        ("Cocktail bar", "a photo of a cocktail bar")
+    ]
+
     private let ciContext = CIContext()
     private var didAttemptLoad = false
     private var didFailToLoad = false
     private var imageModel: MLModel?
     private var textModel: MLModel?
     private var promptEmbeddings: [MobileCLIPPromptEmbedding] = []
+    private var cuisineEmbeddings: [(tag: String, embedding: [Float])] = []
 
     func assess(photoData: Data) async -> FoodVenueExteriorAssessment? {
         do {
@@ -139,6 +168,41 @@ actor MobileCLIPVenueScorer {
         }
     }
 
+    /// Best-guess cuisine tags for a venue photo, most confident first.
+    /// Returns at most two tags; empty when the models are unavailable or
+    /// nothing scores clearly enough.
+    func cuisineTags(photoData: Data) async -> [String] {
+        do {
+            try loadIfNeeded()
+            guard
+                let imageModel,
+                !cuisineEmbeddings.isEmpty,
+                let imageEmbedding = try imageEmbedding(from: photoData, using: imageModel)
+            else {
+                return []
+            }
+
+            let scored = cuisineEmbeddings
+                .map { (tag: $0.tag, similarity: Double(cosineSimilarity($0.embedding, imageEmbedding))) }
+                .sorted { $0.similarity > $1.similarity }
+
+            guard let best = scored.first, best.similarity >= 0.21 else {
+                return []
+            }
+
+            var tags = [best.tag]
+            if let second = scored.dropFirst().first,
+               second.similarity >= 0.21,
+               second.similarity >= best.similarity - 0.015 {
+                tags.append(second.tag)
+            }
+
+            return tags
+        } catch {
+            return []
+        }
+    }
+
     private func loadIfNeeded() throws {
         if didFailToLoad {
             throw CLIPTokenizerError.missingVocabulary
@@ -169,9 +233,21 @@ actor MobileCLIPVenueScorer {
             )
         }
 
+        var cuisineEmbeddings: [(tag: String, embedding: [Float])] = []
+        cuisineEmbeddings.reserveCapacity(Self.cuisinePromptCatalog.count)
+        for prompt in Self.cuisinePromptCatalog {
+            let embedding = try textEmbedding(
+                for: prompt.text,
+                using: tokenizer,
+                model: textModel
+            )
+            cuisineEmbeddings.append((tag: prompt.tag, embedding: embedding))
+        }
+
         self.imageModel = imageModel
         self.textModel = textModel
         self.promptEmbeddings = promptEmbeddings
+        self.cuisineEmbeddings = cuisineEmbeddings
     }
 
     private func loadModel(named name: String) throws -> MLModel {

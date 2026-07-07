@@ -64,6 +64,10 @@ struct SavedPlaceDetailView: View {
                     LaterrrTag(title: place.displayCategory)
                 }
 
+                ForEach(place.cuisineTags.prefix(2), id: \.self) { tag in
+                    LaterrrTag(title: tag)
+                }
+
                 LaterrrTag(title: place.source.title)
             }
         }

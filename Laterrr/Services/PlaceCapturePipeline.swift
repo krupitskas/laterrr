@@ -18,6 +18,7 @@ enum PlaceCapturePipeline {
             extractedText = await VenueTextRecognizer.recognizeText(in: photoData)
         }
         let candidates = await searcher.searchCandidates(near: location, extractedText: extractedText)
+        let cuisineTags = await MobileCLIPVenueScorer.shared.cuisineTags(photoData: photoData)
 
         let initialRanking = matcher.rank(
             candidates: candidates,
@@ -43,7 +44,8 @@ enum PlaceCapturePipeline {
             extractedText: extractedText,
             suggestions: suggestions,
             analysisMethod: analysisMethod,
-            narrative: initialRanking.narrative
+            narrative: initialRanking.narrative,
+            cuisineTags: cuisineTags
         )
     }
 }

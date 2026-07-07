@@ -84,4 +84,5 @@ struct CaptureAnalysisPayload {
     let suggestions: [PlaceSuggestion]
     let analysisMethod: String
     let narrative: String
+    var cuisineTags: [String] = []
 }

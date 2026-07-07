@@ -8,11 +8,14 @@ struct RootView: View {
     @EnvironmentObject private var tikTokImportCoordinator: TikTokImportCoordinator
     @Query(sort: \SavedPlace.createdAt, order: .reverse) private var savedPlaces: [SavedPlace]
     @State private var selectedTab: RootTab = .capture
-    @State private var placesPath: [UUID] = []
+    @State private var placesPath: [PlacesRoute] = []
 
     // Owned here so the camera session survives tab switches and stays warm
     // for the whole app session — returning to Capture is instant.
     @StateObject private var captureViewModel = CaptureViewModel()
+
+    // Owned here so the concierge conversation survives navigation pushes.
+    @StateObject private var placesChatModel = PlacesChatModel()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -108,10 +111,24 @@ struct RootView: View {
 
             case .places:
                 NavigationStack(path: $placesPath) {
-                    PlacesListView(openPlace: openPlaceFromPlaces)
-                        .navigationDestination(for: UUID.self) { placeID in
+                    PlacesListView(
+                        openPlace: openPlaceFromPlaces,
+                        openChat: { placesPath.append(.chat) }
+                    )
+                    .navigationDestination(for: PlacesRoute.self) { route in
+                        switch route {
+                        case let .place(placeID):
                             placeDestination(for: placeID)
+
+                        case .chat:
+                            PlacesChatView(
+                                model: placesChatModel,
+                                openPlace: { place in
+                                    placesPath.append(.place(place.id))
+                                }
+                            )
                         }
+                    }
                 }
 
             case .capture:
@@ -141,7 +158,7 @@ struct RootView: View {
     }
 
     private func showPlace(_ place: SavedPlace, switchToPlacesTab: Bool) {
-        placesPath = [place.id]
+        placesPath = [.place(place.id)]
 
         if switchToPlacesTab {
             selectedTab = .places
@@ -169,4 +186,9 @@ private enum RootTab: Hashable {
     case capture
     case review
     case settings
+}
+
+enum PlacesRoute: Hashable {
+    case place(UUID)
+    case chat
 }
