@@ -132,7 +132,7 @@ final class NearbyVenueSearcher {
                 name: item.name ?? "Unknown Venue",
                 shortAddress: item.address?.shortAddress ?? item.address?.fullAddress ?? "Nearby venue",
                 fullAddress: item.address?.fullAddress ?? item.address?.shortAddress ?? "Nearby venue",
-                category: item.pointOfInterestCategory?.rawValue.replacingOccurrences(of: "_", with: " ").capitalized ?? "Venue",
+                category: categoryTitle(for: item.pointOfInterestCategory),
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude,
                 distanceMeters: referenceLocation?.distance(from: item.location) ?? 0,
@@ -140,6 +140,26 @@ final class NearbyVenueSearcher {
                 phoneNumber: item.phoneNumber
             )
         }
+    }
+
+    // Raw identifiers look like "MKPOICategoryFoodMarket" — strip the prefix
+    // and split the camel case so the UI shows "Food Market".
+    private static func categoryTitle(for category: MKPointOfInterestCategory?) -> String {
+        guard var name = category?.rawValue, !name.isEmpty else {
+            return "Venue"
+        }
+
+        if name.hasPrefix("MKPOICategory") {
+            name = String(name.dropFirst("MKPOICategory".count))
+        }
+
+        let spaced = name.replacingOccurrences(
+            of: "(?<=[a-z])(?=[A-Z])",
+            with: " ",
+            options: .regularExpression
+        )
+
+        return spaced.isEmpty ? "Venue" : spaced
     }
 
     private func deduplicatedCandidates(

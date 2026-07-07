@@ -1,5 +1,84 @@
 import SwiftUI
 
+// Attaches the full photo-review experience (fullscreen deck, preparing
+// overlay with cancel, error alert) to any host screen.
+struct PhotoReviewPresentation: ViewModifier {
+    @ObservedObject var controller: PhotoLibraryReviewController
+    @Environment(\.modelContext) private var modelContext
+
+    func body(content: Content) -> some View {
+        content
+            .fullScreenCover(
+                isPresented: Binding(
+                    get: { controller.isPresentingReview },
+                    set: { if !$0 { controller.dismissReview() } }
+                )
+            ) {
+                PhotoLibraryReviewView(
+                    controller: controller,
+                    skipAction: {
+                        controller.skipCurrent()
+                    },
+                    saveAction: {
+                        controller.saveCurrent(modelContext: modelContext)
+                    }
+                )
+            }
+            .overlay {
+                if controller.isPreparing && !controller.isPresentingReview {
+                    LaterrrPalette.canvas.opacity(0.8)
+                        .ignoresSafeArea()
+                        .overlay {
+                            InkCard(alignment: .center) {
+                                InkSpinner(size: 36)
+
+                                Text("Reviewing place photos")
+                                    .font(LaterrrTypography.display(26))
+                                    .foregroundStyle(LaterrrPalette.ink)
+                                    .multilineTextAlignment(.center)
+
+                                InkProgressBar(value: controller.progressFraction)
+
+                                Text(controller.progressSummary)
+                                    .font(LaterrrTypography.body(.subheadline))
+                                    .foregroundStyle(LaterrrPalette.inkSecondary)
+                                    .multilineTextAlignment(.center)
+
+                                Button {
+                                    controller.dismissReview()
+                                } label: {
+                                    Text("Cancel")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.inkOutline)
+                            }
+                            .frame(maxWidth: 340)
+                            .padding(24)
+                        }
+                }
+            }
+            .alert(
+                "Photos Review",
+                isPresented: Binding(
+                    get: { controller.alertMessage != nil },
+                    set: { if !$0 { controller.dismissAlert() } }
+                )
+            ) {
+                Button("OK", role: .cancel) {
+                    controller.dismissAlert()
+                }
+            } message: {
+                Text(controller.alertMessage ?? "")
+            }
+    }
+}
+
+extension View {
+    func photoReviewPresentation(controller: PhotoLibraryReviewController) -> some View {
+        modifier(PhotoReviewPresentation(controller: controller))
+    }
+}
+
 struct PhotoLibraryReviewView: View {
     @ObservedObject var controller: PhotoLibraryReviewController
     let skipAction: () -> Void
@@ -97,7 +176,7 @@ struct PhotoLibraryReviewView: View {
                 .font(LaterrrTypography.display(26))
                 .foregroundStyle(LaterrrPalette.ink)
 
-            if let dayWindow = controller.deck?.dayWindow {
+            if let dayWindow = controller.deck?.dayWindow, dayWindow > 0 {
                 MicroText(
                     "Recent photos — last \(dayWindow) days",
                     size: 9,

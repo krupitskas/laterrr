@@ -49,6 +49,25 @@ struct SavedPlacesMapView: View {
                         Rectangle()
                             .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
                     }
+                    .overlay(alignment: .bottomTrailing) {
+                        Button {
+                            focusOnUser()
+                        } label: {
+                            Image(systemName: "scope")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(Color.black)
+                                .frame(width: 44, height: 44)
+                                .background(Color.white)
+                                .overlay {
+                                    Rectangle()
+                                        .strokeBorder(Color.black, lineWidth: 1)
+                                }
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(12)
+                        .accessibilityLabel("Center on your location")
+                    }
                     .padding(.horizontal, 20)
                     .padding(.top, 16)
                     .padding(.bottom, 16)
@@ -82,6 +101,23 @@ struct SavedPlacesMapView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .bottom) {
             HairlineDivider()
+        }
+    }
+
+    private func focusOnUser() {
+        guard let coordinate = locationStore.currentLocation?.coordinate else {
+            locationStore.requestAuthorizationIfNeeded()
+            return
+        }
+
+        withAnimation {
+            cameraPosition = .region(
+                MKCoordinateRegion(
+                    center: coordinate,
+                    latitudinalMeters: 900,
+                    longitudinalMeters: 900
+                )
+            )
         }
     }
 
@@ -145,10 +181,9 @@ private struct UserLocationPin: View {
     var body: some View {
         ZStack {
             if let heading {
-                HeadingWedge()
-                    .fill(Color.black)
-                    .frame(width: 12, height: 9)
-                    .offset(y: -16)
+                FieldOfViewCone()
+                    .fill(Color.black.opacity(0.16))
+                    .frame(width: 84, height: 84)
                     .rotationEffect(.degrees(heading))
             }
 
@@ -163,17 +198,33 @@ private struct UserLocationPin: View {
             Circle()
                 .fill(Color.black)
                 .frame(width: 9, height: 9)
+
+            Text("YOU")
+                .font(LaterrrTypography.micro(8))
+                .kerning(1.2)
+                .foregroundStyle(Color.white)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(Color.black)
+                .offset(y: -26)
         }
         .accessibilityLabel("Your location")
     }
 }
 
-private struct HeadingWedge: Shape {
+// A ~56° cone anchored at the dot, showing which way the device is facing.
+private struct FieldOfViewCone: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        path.move(to: center)
+        path.addArc(
+            center: center,
+            radius: rect.width / 2,
+            startAngle: .degrees(-118),
+            endAngle: .degrees(-62),
+            clockwise: false
+        )
         path.closeSubpath()
         return path
     }

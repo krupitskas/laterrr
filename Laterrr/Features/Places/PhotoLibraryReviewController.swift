@@ -8,7 +8,7 @@ struct PhotoLibraryReviewCandidate: Identifiable {
     let id: String
     let photoData: Data
     let capturedAt: Date
-    let location: CLLocation
+    let location: CLLocation?
     let analysis: CaptureAnalysisPayload
 }
 
@@ -21,6 +21,8 @@ enum PhotoLibraryReviewError: LocalizedError {
     case unauthorized
     case noRecentPhotos
     case noPlacePhotos
+    case photoUnavailable
+    case noMatchForPhoto
 
     var errorDescription: String? {
         switch self {
@@ -30,6 +32,10 @@ enum PhotoLibraryReviewError: LocalizedError {
             return "laterrr could not find recent photos in that date range with location data."
         case .noPlacePhotos:
             return "laterrr checked your recent photos, but it did not find believable cafe, restaurant, or storefront shots yet."
+        case .photoUnavailable:
+            return "laterrr could not load that photo from your library."
+        case .noMatchForPhoto:
+            return "laterrr could not match that photo to a place. Try one with clearer signage or location data."
         }
     }
 }
@@ -82,7 +88,7 @@ final class PhotoLibraryReviewController: ObservableObject {
             return "\(processedPhotoCount) of \(totalPhotoCount) photos checked - \(readyCount) ready now"
         }
 
-        return "Scan complete - \(matchedPhotoCount) place photos found"
+        return "Scan complete - \(matchedPhotoCount) place photo\(matchedPhotoCount == 1 ? "" : "s") found"
     }
 
     var currentCandidate: PhotoLibraryReviewCandidate? {
@@ -139,6 +145,47 @@ final class PhotoLibraryReviewController: ObservableObject {
                 }
 
                 finishIfNeeded()
+            } catch {
+                guard !Task.isCancelled else { return }
+
+                let errorMessage = error.localizedDescription
+                reviewTask = nil
+                resetSession(preserveAlert: true)
+                alertMessage = errorMessage
+            }
+        }
+    }
+
+    // Reviews one deliberately-picked photo: same deck UI as the bulk scan,
+    // but the scene filters are skipped — the user already chose the photo.
+    func startSinglePhotoReview(itemIdentifier: String?, enableLookAroundVerification: Bool) {
+        guard let itemIdentifier, !itemIdentifier.isEmpty else {
+            alertMessage = PhotoLibraryReviewError.photoUnavailable.localizedDescription
+            return
+        }
+
+        reviewTask?.cancel()
+        resetSession(preserveAlert: false)
+        isPreparing = true
+
+        reviewTask = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                let candidate = try await PhotoLibraryReviewService.singlePhotoCandidate(
+                    itemIdentifier: itemIdentifier,
+                    enableLookAroundVerification: enableLookAroundVerification
+                )
+
+                guard !Task.isCancelled else { return }
+
+                totalPhotoCount = 1
+                processedPhotoCount = 1
+                isPreparing = false
+                isScanning = false
+                deck = PhotoLibraryReviewDeck(dayWindow: 0, candidates: [])
+                append(candidate, dayWindow: 0)
+                reviewTask = nil
             } catch {
                 guard !Task.isCancelled else { return }
 
@@ -278,6 +325,45 @@ enum PhotoLibraryReviewService {
         }
 
         return assets
+    }
+
+    static func singlePhotoCandidate(
+        itemIdentifier: String,
+        enableLookAroundVerification: Bool
+    ) async throws -> PhotoLibraryReviewCandidate {
+        let authorizationStatus = await requestAuthorizationIfNeeded()
+        guard authorizationStatus == .authorized || authorizationStatus == .limited else {
+            throw PhotoLibraryReviewError.unauthorized
+        }
+
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [itemIdentifier], options: nil)
+        guard let asset = fetchResult.firstObject else {
+            throw PhotoLibraryReviewError.photoUnavailable
+        }
+
+        guard let photoData = await photoData(for: asset) else {
+            throw PhotoLibraryReviewError.photoUnavailable
+        }
+
+        let extractedText = await VenueTextRecognizer.recognizeText(in: photoData)
+        let analysis = await PlaceCapturePipeline.analyze(
+            photoData: photoData,
+            location: asset.location,
+            enableLookAroundVerification: enableLookAroundVerification,
+            extractedText: extractedText
+        )
+
+        guard !analysis.suggestions.isEmpty else {
+            throw PhotoLibraryReviewError.noMatchForPhoto
+        }
+
+        return PhotoLibraryReviewCandidate(
+            id: asset.localIdentifier,
+            photoData: photoData,
+            capturedAt: asset.creationDate ?? .now,
+            location: asset.location,
+            analysis: analysis
+        )
     }
 
     static func candidate(

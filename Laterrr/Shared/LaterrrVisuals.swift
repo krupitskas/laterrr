@@ -436,6 +436,7 @@ struct EmptyStateView: View {
 struct EditorialTabBar<Selection: Hashable>: View {
     let items: [(title: String, value: Selection)]
     @Binding var selection: Selection
+    var onReselect: (Selection) -> Void = { _ in }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -447,7 +448,11 @@ struct EditorialTabBar<Selection: Hashable>: View {
                     let isActive = selection == item.value
 
                     Button {
-                        selection = item.value
+                        if selection == item.value {
+                            onReselect(item.value)
+                        } else {
+                            selection = item.value
+                        }
                     } label: {
                         VStack(spacing: 6) {
                             MicroText(

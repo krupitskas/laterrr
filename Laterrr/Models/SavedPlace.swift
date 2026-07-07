@@ -71,6 +71,28 @@ final class SavedPlace {
         get { SavedPlaceSource(rawValue: sourceRawValue) ?? .camera }
         set { sourceRawValue = newValue.rawValue }
     }
+
+    /// Older saves stored raw MapKit identifiers mangled by `.capitalized`
+    /// (e.g. "Mkpoicategoryrestaurant"); clean those up for display.
+    var displayCategory: String {
+        var name = category.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !name.isEmpty else {
+            return ""
+        }
+
+        if name.lowercased().hasPrefix("mkpoicategory") {
+            name = String(name.dropFirst("mkpoicategory".count))
+        }
+
+        name = name.replacingOccurrences(
+            of: "(?<=[a-z])(?=[A-Z])",
+            with: " ",
+            options: .regularExpression
+        )
+
+        return name.capitalized
+    }
 }
 
 struct SavedPlaceDraft {

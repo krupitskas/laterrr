@@ -9,6 +9,7 @@ struct CaptureView: View {
     @EnvironmentObject private var tikTokImportCoordinator: TikTokImportCoordinator
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var viewModel: CaptureViewModel
+    @StateObject private var photoReviewController = PhotoLibraryReviewController()
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var pinchBaseZoomFactor: CGFloat?
     @State private var pastedTikTokURLString = ""
@@ -33,9 +34,12 @@ struct CaptureView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
-        .onChange(of: selectedPhotoItem) { _, newValue in
-            viewModel.importPhoto(
-                from: newValue,
+        .photoReviewPresentation(controller: photoReviewController)
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            guard let newItem else { return }
+            selectedPhotoItem = nil
+            photoReviewController.startSinglePhotoReview(
+                itemIdentifier: newItem.itemIdentifier,
                 enableLookAroundVerification: settingsStore.enableLookAroundVerification
             )
         }
@@ -159,20 +163,7 @@ struct CaptureView: View {
     }
 
     private var captureControls: some View {
-        HStack(spacing: 18) {
-            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                MicroText("Photos", size: 9, kerning: 1.5)
-                    .frame(width: 64, height: 40)
-                    .overlay {
-                        Rectangle()
-                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
-                    }
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
+        ZStack {
             Button {
                 viewModel.capture(
                     enableLookAroundVerification: settingsStore.enableLookAroundVerification
@@ -192,23 +183,42 @@ struct CaptureView: View {
             .disabled(viewModel.cameraSession.authorizationStatus != .authorized)
             .accessibilityLabel("Capture photo")
 
-            Spacer()
+            HStack {
+                PhotosPicker(
+                    selection: $selectedPhotoItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    MicroText("Photo", size: 9, kerning: 1.5)
+                        .frame(width: 64, height: 40)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(photoReviewController.isPreparing)
+                .accessibilityLabel("Review a photo from your library")
 
-            Button {
-                pastedTikTokURLString = TikTokImportURLParser.clipboardCandidate(
-                    from: UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString
-                )
-                isTikTokPasteSheetPresented = true
-            } label: {
-                MicroText("Link", size: 9, kerning: 1.5)
-                    .frame(width: 64, height: 40)
-                    .overlay {
-                        Rectangle()
-                            .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
-                    }
-                    .contentShape(Rectangle())
+                Spacer()
+
+                Button {
+                    pastedTikTokURLString = TikTokImportURLParser.clipboardCandidate(
+                        from: UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString
+                    )
+                    isTikTokPasteSheetPresented = true
+                } label: {
+                    MicroText("TikTok", size: 9, kerning: 1.5)
+                        .frame(width: 64, height: 40)
+                        .overlay {
+                            Rectangle()
+                                .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)

@@ -27,7 +27,12 @@ struct RootView: View {
                     ("Review", RootTab.review),
                     ("Settings", RootTab.settings)
                 ],
-                selection: $selectedTab
+                selection: $selectedTab,
+                onReselect: { tab in
+                    if tab == .places {
+                        placesPath = []
+                    }
+                }
             )
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)

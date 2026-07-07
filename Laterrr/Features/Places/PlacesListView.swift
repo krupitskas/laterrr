@@ -8,6 +8,7 @@ struct PlacesListView: View {
     let openPlace: (SavedPlace) -> Void
 
     @State private var searchText = ""
+    @State private var selectedCategory: String?
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -32,6 +33,11 @@ struct PlacesListView: View {
 
             searchField
                 .padding(.top, 8)
+
+            if !availableCategories.isEmpty {
+                categoryChips
+                    .padding(.top, 12)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
@@ -40,6 +46,50 @@ struct PlacesListView: View {
         .overlay(alignment: .bottom) {
             HairlineDivider()
         }
+    }
+
+    private var categoryChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                categoryChip(title: "All", isSelected: selectedCategory == nil) {
+                    selectedCategory = nil
+                }
+
+                ForEach(availableCategories, id: \.self) { category in
+                    categoryChip(title: category, isSelected: selectedCategory == category) {
+                        selectedCategory = category
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, -20)
+        .contentMargins(.horizontal, 20, for: .scrollContent)
+    }
+
+    private func categoryChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            MicroText(
+                title,
+                size: 9,
+                kerning: 1.5,
+                color: isSelected ? LaterrrPalette.canvas : LaterrrPalette.ink
+            )
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(isSelected ? LaterrrPalette.ink : LaterrrPalette.canvas)
+            .overlay {
+                Rectangle()
+                    .strokeBorder(LaterrrPalette.ink, lineWidth: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    private var availableCategories: [String] {
+        Array(Set(savedPlaces.map(\.displayCategory).filter { !$0.isEmpty })).sorted()
     }
 
     private var searchField: some View {
@@ -139,13 +189,20 @@ struct PlacesListView: View {
     }
 
     private var filteredPlaces: [SavedPlace] {
+        let categoryPlaces: [SavedPlace]
+        if let selectedCategory, availableCategories.contains(selectedCategory) {
+            categoryPlaces = savedPlaces.filter { $0.displayCategory == selectedCategory }
+        } else {
+            categoryPlaces = savedPlaces
+        }
+
         let normalizedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !normalizedSearch.isEmpty else {
-            return savedPlaces
+            return categoryPlaces
         }
 
-        return savedPlaces.filter { place in
+        return categoryPlaces.filter { place in
             place.name.localizedCaseInsensitiveContains(normalizedSearch)
                 || place.fullAddress.localizedCaseInsensitiveContains(normalizedSearch)
                 || place.shortAddress.localizedCaseInsensitiveContains(normalizedSearch)

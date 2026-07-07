@@ -44,8 +44,6 @@ struct SavedPlaceDetailView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            MicroText("Saved place", color: LaterrrPalette.inkSecondary)
-
             HStack(alignment: .top, spacing: 12) {
                 Text(displayName)
                     .font(LaterrrTypography.display(38))
@@ -60,6 +58,14 @@ struct SavedPlaceDetailView: View {
             Text(place.fullAddress)
                 .font(LaterrrTypography.body(.subheadline))
                 .foregroundStyle(LaterrrPalette.inkSecondary)
+
+            HStack(spacing: 8) {
+                if !place.displayCategory.isEmpty {
+                    LaterrrTag(title: place.displayCategory)
+                }
+
+                LaterrrTag(title: place.source.title)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -135,11 +141,6 @@ struct SavedPlaceDetailView: View {
                 value: place.createdAt.formatted(date: .abbreviated, time: .shortened)
             )
             HairlineDivider(color: LaterrrPalette.ink.opacity(0.2))
-
-            if !place.category.isEmpty {
-                InkKeyValueRow(key: "Category", value: place.category)
-                HairlineDivider(color: LaterrrPalette.ink.opacity(0.2))
-            }
 
             if !place.matchedText.isEmpty {
                 InkKeyValueRow(key: "Matched", value: place.matchedText)

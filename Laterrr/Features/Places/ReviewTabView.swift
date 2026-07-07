@@ -2,7 +2,6 @@ import SwiftData
 import SwiftUI
 
 struct ReviewTabView: View {
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var settingsStore: SettingsStore
 
     @StateObject private var photoReviewController = PhotoLibraryReviewController()
@@ -84,68 +83,7 @@ struct ReviewTabView: View {
         } message: {
             Text("laterrr will scan recent photos with location data, look for place text, and build a review deck before anything is saved.")
         }
-        .fullScreenCover(
-            isPresented: Binding(
-                get: { photoReviewController.isPresentingReview },
-                set: { if !$0 { photoReviewController.dismissReview() } }
-            )
-        ) {
-            PhotoLibraryReviewView(
-                controller: photoReviewController,
-                skipAction: {
-                    photoReviewController.skipCurrent()
-                },
-                saveAction: {
-                    photoReviewController.saveCurrent(modelContext: modelContext)
-                }
-            )
-        }
-        .overlay {
-            if photoReviewController.isPreparing && !photoReviewController.isPresentingReview {
-                LaterrrPalette.canvas.opacity(0.8)
-                    .ignoresSafeArea()
-                    .overlay {
-                        InkCard(alignment: .center) {
-                            InkSpinner(size: 36)
-
-                            Text("Reviewing recent place photos")
-                                .font(LaterrrTypography.display(26))
-                                .foregroundStyle(LaterrrPalette.ink)
-                                .multilineTextAlignment(.center)
-
-                            InkProgressBar(value: photoReviewController.progressFraction)
-
-                            Text(photoReviewController.progressSummary)
-                                .font(LaterrrTypography.body(.subheadline))
-                                .foregroundStyle(LaterrrPalette.inkSecondary)
-                                .multilineTextAlignment(.center)
-
-                            Button {
-                                photoReviewController.dismissReview()
-                            } label: {
-                                Text("Cancel")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.inkOutline)
-                        }
-                        .frame(maxWidth: 340)
-                        .padding(24)
-                    }
-            }
-        }
-        .alert(
-            "Photos Review",
-            isPresented: Binding(
-                get: { photoReviewController.alertMessage != nil },
-                set: { if !$0 { photoReviewController.dismissAlert() } }
-            )
-        ) {
-            Button("OK", role: .cancel) {
-                photoReviewController.dismissAlert()
-            }
-        } message: {
-            Text(photoReviewController.alertMessage ?? "")
-        }
+        .photoReviewPresentation(controller: photoReviewController)
     }
 
     private var header: some View {
